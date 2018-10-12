@@ -1,7 +1,8 @@
-var mongoose = require( 'mongoose' );
+var mongoose = require('mongoose');
 
-var Block     = mongoose.model( 'Block' );
-var Transaction = mongoose.model( 'Transaction' );
+var Block = mongoose.model('Block');
+var Transaction = mongoose.model('Transaction');
+var Uncle = mongoose.model('Uncle');
 var filters = require('./filters');
 
 var _ = require('lodash');
@@ -11,7 +12,7 @@ var BigNumber = require('bignumber.js');
 var config = {};
 try {
   config = require('../config.json');
-} catch(e) {
+} catch (e) {
   if (e.code == 'MODULE_NOT_FOUND') {
     console.log('No config file found. Using default configuration... (tools/config.json)');
     config = require('../tools/config.json');
@@ -21,7 +22,7 @@ try {
   }
 }
 
-module.exports = function(app){
+module.exports = function (app) {
   var web3relay = require('./web3relay');
 
   var DAO = require('./dao');
@@ -46,7 +47,7 @@ module.exports = function(app){
   app.post('/data', getData);
 
   app.post('/daorelay', DAO);
-  app.post('/tokenrelay', Token);  
+  app.post('/tokenrelay', Token);
   app.post('/web3relay', web3relay.data);
   app.post('/compile', compile);
 
@@ -55,9 +56,11 @@ module.exports = function(app){
   app.post('/supply', getTotalSupply);
   app.get('/supply/:act', getTotalSupply);
   app.get('/supply', getTotalSupply);
+  app.post('/blocks', getBlocks);
+  app.post('/uncles',getUncles);
 }
 
-var getAddr = function(req, res){
+var getAddr = function (req, res) {
   // TODO: validate addr and tx
   var addr = req.body.addr.toLowerCase();
   var count = parseInt(req.body.count);
@@ -65,9 +68,9 @@ var getAddr = function(req, res){
   var limit = parseInt(req.body.length);
   var start = parseInt(req.body.start);
 
-  var data = { draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count, mined: 0 };
+  var data = {draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count, mined: 0};
 
-  var addrFind = Transaction.find( { $or: [{"to": addr}, {"from": addr}] })  
+  var addrFind = Transaction.find({$or: [{"to": addr}, {"from": addr}]})
 
   var sortOrder = '-blockNumber';
   if (req.body.order && req.body.order[0] && req.body.order[0].column) {
@@ -90,44 +93,44 @@ var getAddr = function(req, res){
     });
 
 };
-var getAddrCounter = function(req, res) {
+var getAddrCounter = function (req, res) {
   var addr = req.body.addr.toLowerCase();
   var count = parseInt(req.body.count);
-  var data = { recordsFiltered: count, recordsTotal: count, mined: 0 };
+  var data = {recordsFiltered: count, recordsTotal: count, mined: 0};
 
   async.waterfall([
-  function(callback) {
+    function (callback) {
 
-  Transaction.count({ $or: [{"to": addr}, {"from": addr}] }, function(err, count) {
-    if (!err && count) {
-      // fix recordsTotal
-      data.recordsTotal = count;
-      data.recordsFiltered = count;
-    }
-    callback(null);
-  });
+      Transaction.count({$or: [{"to": addr}, {"from": addr}]}, function (err, count) {
+        if (!err && count) {
+          // fix recordsTotal
+          data.recordsTotal = count;
+          data.recordsFiltered = count;
+        }
+        callback(null);
+      });
 
-  }, function(callback) {
+    }, function (callback) {
 
-  Block.count({ "miner": addr }, function(err, count) {
-    if (!err && count) {
-      data.mined = count;
-    }
-    callback(null);
-  });
+      Block.count({"miner": addr}, function (err, count) {
+        if (!err && count) {
+          data.mined = count;
+        }
+        callback(null);
+      });
 
-  }], function (err) {
+    }], function (err) {
     res.write(JSON.stringify(data));
     res.end();
   });
 
 };
-var getBlock = function(req, res) {
+var getBlock = function (req, res) {
   // TODO: support queries for block hash
   var txQuery = "number";
   var number = parseInt(req.body.block);
 
-  var blockFind = Block.findOne( { number : number }).lean(true);
+  var blockFind = Block.findOne({number: number}).lean(true);
   blockFind.exec(function (err, doc) {
     if (err || !doc) {
       console.error("BlockFind error: " + err)
@@ -141,11 +144,11 @@ var getBlock = function(req, res) {
   });
 };
 
-/** 
+/**
  * calc totalSupply
  * total supply = genesis alloc + miner rewards + estimated uncle rewards
  */
-var getTotalSupply = function(req, res) {
+var getTotalSupply = function (req, res) {
   var act;
   if (req.params.act && ['total', 'totalSupply', 'genesisAlloc', 'minerRewards', 'uncleRewards'].indexOf(req.params.act) > -1) {
     act = req.params.act;
@@ -155,7 +158,7 @@ var getTotalSupply = function(req, res) {
   }
 
   Block.findOne({}).lean(true).sort('-number').exec(function (err, latest) {
-    if(err || !latest) {
+    if (err || !latest) {
       console.error("getTotalSupply error: " + err)
       res.write(JSON.stringify({"error": true}));
       res.end();
@@ -173,8 +176,8 @@ var getTotalSupply = function(req, res) {
         genesisAlloc: 49922489.5246415,
         blocks: [
           /* will be regeneragted later for ECIP1017 enabled case */
-          { start:        1, reward: 9e+18, uncle:  0.90625 },
-          { start:   600000, reward: 5e+18, uncle:  0.90625 },
+          {start: 1, reward: 9e+18, uncle: 0.90625},
+          {start: 600000, reward: 5e+18, uncle: 0.90625},
         ]
       };
 
@@ -216,7 +219,7 @@ var getTotalSupply = function(req, res) {
         }
 
         // check reward blocks, calc total miner's reward
-        rewards.blocks.forEach(function(block, i) {
+        rewards.blocks.forEach(function (block, i) {
           if (blockNumber > block.start) {
             var startBlock = block.start;
             if (startBlock < 0) {
@@ -227,7 +230,7 @@ var getTotalSupply = function(req, res) {
             if (rewards.blocks[i + 1] && blockNumber > rewards.blocks[i + 1].start) {
               endBlock = rewards.blocks[i + 1].start - 1;
             }
-            blocks.push({start: startBlock, end: endBlock, reward: reward, uncle: block.uncle });
+            blocks.push({start: startBlock, end: endBlock, reward: reward, uncle: block.uncle});
 
             var blockNum = endBlock - startBlock;
             total = total.plus(reward.times(new BigNumber(blockNum)));
@@ -236,7 +239,12 @@ var getTotalSupply = function(req, res) {
       }
 
       var totalSupply = total.plus(genesisAlloc);
-      var ret = { "height": blockNumber, "totalSupply": totalSupply.div(1e+18), "genesisAlloc": genesisAlloc.div(1e+18), "minerRewards": total.div(1e+18) };
+      var ret = {
+        "height": blockNumber,
+        "totalSupply": totalSupply.div(1e+18),
+        "genesisAlloc": genesisAlloc.div(1e+18),
+        "minerRewards": total.div(1e+18)
+      };
       if (req.method === 'POST' && typeof rewards.genesisAlloc === 'object') {
         ret.genesisAlloc = rewards.genesisAlloc;
       }
@@ -245,11 +253,11 @@ var getTotalSupply = function(req, res) {
       var uncleRewards = [];
       if (typeof rewards.estimateUncle === 'boolean' && rewards.estimateUncle && blocks.length > 0) {
         // aggregate uncle blocks (slow)
-        blocks.forEach(function(block) {
+        blocks.forEach(function (block) {
           Block.aggregate([
-            { $match: { number: { $gte: block.start, $lt: block.end } } },
-            { $group: { _id: null, uncles: { $sum: { $size: "$uncles" } } } }
-          ]).exec(function(err, results) {
+            {$match: {number: {$gte: block.start, $lt: block.end}}},
+            {$group: {_id: null, uncles: {$sum: {$size: "$uncles"}}}}
+          ]).exec(function (err, results) {
             if (err) {
               console.log(err);
             }
@@ -260,7 +268,7 @@ var getTotalSupply = function(req, res) {
             }
             if (uncleRewards.length === blocks.length) {
               var totalUncleRewards = new BigNumber(0);
-              uncleRewards.forEach(function(reward) {
+              uncleRewards.forEach(function (reward) {
                 totalUncleRewards = totalUncleRewards.plus(reward);
               });
               ret.uncleRewards = totalUncleRewards.div(1e+18);
@@ -277,13 +285,13 @@ var getTotalSupply = function(req, res) {
         return;
       } else if (typeof rewards.estimateUncle === 'number' && rewards.estimateUncle > 0) {
         // estimate Uncle rewards with uncle probability. (faster)
-        blocks.forEach(function(block) {
+        blocks.forEach(function (block) {
           var blockcount = block.end - block.start;
           var reward = block.reward.times(new BigNumber(blockcount).times(rewards.estimateUncle)).times(block.uncle);
           uncleRewards.push(reward);
         });
         var totalUncleRewards = new BigNumber(0);
-        uncleRewards.forEach(function(reward) {
+        uncleRewards.forEach(function (reward) {
           totalUncleRewards = totalUncleRewards.plus(reward);
         });
         ret.uncleRewards = totalUncleRewards.div(1e+18);
@@ -299,27 +307,35 @@ var getTotalSupply = function(req, res) {
   });
 };
 
-var getTx = function(req, res){
-  var tx = req.body.tx.toLowerCase();
-  var txFind = Block.findOne( { "transactions.hash" : tx }, "transactions timestamp")
-                  .lean(true);
-  txFind.exec(function (err, doc) {
-    if (!doc){
-      console.log("missing: " +tx)
-      res.write(JSON.stringify({}));
-      res.end();
-    } else {
-      // filter transactions
-      var txDocs = filters.filterBlock(doc, "hash", tx)
-      res.write(JSON.stringify(txDocs));
-      res.end();
-    }
+var getTx = function (req, res) {
+  var tx = req.body;
+  let sql;
+  if ('block' in tx) {
+    sql = {'blockNumber': tx.block};
+  } else if ('addr' in tx) {
+    sql = {$or: [{'from': tx.addr}, {'to': tx.addr}]};
+  } else {
+    sql = {};
+  }
+  var txFind = Transaction.find(sql).lean(true).limit(req.body.size).skip((req.body.page - 1) * req.body.size).sort({timestamp: -1, transactionIndex: -1});
+  var count = Transaction.find(sql).count();
+  count.exec(function (err,num) {
+    txFind.exec(function (err, doc) {
+      if (doc) {
+        res.write(JSON.stringify({total:num,data:doc}));
+        res.end();
+      } else {
+        res.write(JSON.stringify({}));
+        res.end();
+      }
+    })
   });
+
 };
 /*
   Fetch data from DB
 */
-var getData = function(req, res){
+var getData = function (req, res) {
   // TODO: error handling for invalid calls
   var action = req.body.action.toLowerCase();
   var limit = req.body.limit
@@ -328,9 +344,9 @@ var getData = function(req, res){
     if (isNaN(limit))
       var lim = MAX_ENTRIES;
     else
-      var lim = parseInt(limit);  
+      var lim = parseInt(limit);
     DATA_ACTIONS[action](lim, res);
-  } else { 
+  } else {
     console.error("Invalid Request: " + action)
     res.status(400).send();
   }
@@ -339,43 +355,43 @@ var getData = function(req, res){
 /* 
   temporary blockstats here
 */
-var latestBlock = function(req, res) {
+var latestBlock = function (req, res) {
   var block = Block.findOne({}, "totalDifficulty")
-                      .lean(true).sort('-number');
+    .lean(true).sort('-number');
   block.exec(function (err, doc) {
     res.write(JSON.stringify(doc));
     res.end();
   });
-} 
+}
 
 
-var getLatest = function(lim, res, callback) {
+var getLatest = function (lim, res, callback) {
   var blockFind = Block.find({}, "number transactions timestamp miner extraData")
-                      .lean(true).sort('-number').limit(lim);
+    .lean(true).sort('-number').limit(lim);
   blockFind.exec(function (err, docs) {
     callback(docs, res);
   });
 }
 
 /* get blocks from db */
-var sendBlocks = function(lim, res) {
+var sendBlocks = function (lim, res) {
   var blockFind = Block.find({}, "number timestamp miner extraData")
-                      .lean(true).sort('-number').limit(lim);
+    .lean(true).sort('-number').limit(lim);
   blockFind.exec(function (err, docs) {
-    if(!err && docs) {
+    if (!err && docs) {
       var blockNumber = docs[docs.length - 1].number;
       // aggregate transaction counters
       Transaction.aggregate([
-        {$match: { blockNumber: { $gte: blockNumber } }},
-        {$group: { _id: '$blockNumber', count: { $sum: 1 } }}
-      ]).exec(function(err, results) {
+        {$match: {blockNumber: {$gte: blockNumber}}},
+        {$group: {_id: '$blockNumber', count: {$sum: 1}}}
+      ]).exec(function (err, results) {
         var txns = {};
         if (!err && results) {
           // set transaction counters
-          results.forEach(function(txn) {
+          results.forEach(function (txn) {
             txns[txn._id] = txn.count;
           });
-          docs.forEach(function(doc) {
+          docs.forEach(function (doc) {
             doc.txn = txns[doc.number] || 0;
           });
         }
@@ -390,13 +406,42 @@ var sendBlocks = function(lim, res) {
   });
 }
 
-var sendTxs = function(lim, res) {
+var sendTxs = function (lim, res) {
   Transaction.find({}).lean(true).sort('-blockNumber').limit(lim)
-        .exec(function (err, txs) {
-          res.write(JSON.stringify({"txs": txs}));
-          res.end();
-        });
-}
+    .exec(function (err, txs) {
+      res.write(JSON.stringify({"txs": txs}));
+      res.end();
+    });
+};
+// get blocks list
+var getBlocks = function (req, res) {
+  Block.find({}).count().exec(function (err,num) {
+    Block.find({}).lean(true).sort({number:-1}).limit(req.body.size).skip((req.body.page - 1) * req.body.size).exec(function (err,list) {
+      if(list){
+        res.write(JSON.stringify({data:list,total:num}));
+        res.end();
+      }else {
+        res.write(JSON.stringify({}));
+        res.end();
+      }
+    });
+  });
+};
+
+var getUncles = function (req, res) {
+  Uncle.find({}).count().exec(function (err,num) {
+    Uncle.find({}).lean(true).sort({number:-1}).limit(req.body.size).skip((req.body.page - 1) * req.body.size).exec(function (err,list) {
+      if(list){
+        res.write(JSON.stringify({data:list,total:num}));
+        res.end();
+      }else {
+        res.write(JSON.stringify({}));
+        res.end();
+      }
+    })
+  });
+};
+
 
 const MAX_ENTRIES = 10;
 

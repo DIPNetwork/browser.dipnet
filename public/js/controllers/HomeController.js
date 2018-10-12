@@ -35,10 +35,14 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
     $scope.txLoading = false;
     $scope.blockLoading = false;
     $scope.settings = $rootScope.setup;
-    $interval(function () {
+    $scope.timer = $interval(function () {
         $scope.reloadBlocks();
         $scope.reloadTransactions();
-    },5000)
+    },5000);
+
+    $scope.$on('$destroy',function () {
+        $interval.cancel($scope.timer);
+    });
 })
 .directive('simpleSummaryStats', function($http) {
   return {

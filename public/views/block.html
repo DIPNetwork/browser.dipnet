@@ -9,6 +9,7 @@
                 <td>{{block.datetime | date:'yyyy-MM-dd HH:mm:ss Z' }} ({{block.timestamp | timeDuration}} ago)</td>
           </tr>
           <tr ><td width="25%">Hash</td><td>{{block.hash}}</td></tr>
+          <tr ><td width="25%">Transactions</td><td><a href={{'/transaction?block='+block.number}}>{{block.transactions.length}} transactions</a></td></tr>
           <tr ><td width="25%">parentHash</td><td><a href="/block/{{block.number - 1}}">{{block.parentHash}}</td></tr>
           <tr ><td width="25%">sha3 Uncles</td><td>{{block.sha3Uncles}}</td></tr>
           <tr ><td width="25%">Mined By</td><td><a href="/addr/{{block.miner}}">{{block.miner}}</td></tr>
@@ -30,23 +31,5 @@
         </table>
     </div>
     <!--TODO: calculate block reward -->
-
   </div>
-    <!-- Begin: Transaction Datatable -->
-  <div class="portlet light portlet-datatable col-md-12">
-     <div class="portlet-body">
-    <table class="table table-condensed">
-        <thead ng-show="block.transactions.length > 0">
-            <tr>
-                <th> Transactions </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="t in block.transactions">
-                <td> <a href="/tx/{{t}}">{{t}}</a> </td>
-            </tr>
-        </tbody>
-    </table>
-      </div>
-    </div><!-- End: portlet -->
 </div>

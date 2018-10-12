@@ -21,7 +21,8 @@ var Block = new Schema(
     "gasUsed": Number,
     "timestamp": Number,
     "blockTime": Number,
-    "uncles": [String]
+    "uncles": [String],
+    "transactions":Number
 });
 
 var Account = new Schema(
@@ -57,7 +58,12 @@ var Transaction = new Schema(
     "gas": Number,
     "gasPrice": String,
     "timestamp": Number,
-    "input": String
+    "input": String,
+    "cumulativeGasUsed":Number,
+    "gasUsed":Number,
+    "contractAddress":String,
+    "logs":Array,
+    "status":String
 }, {collection: "Transaction"});
 
 var BlockStat = new Schema(
@@ -74,6 +80,30 @@ var BlockStat = new Schema(
     "uncleCount": Number
 });
 
+var Uncle = new Schema({
+  "number": {type: Number, index: {unique: true}},
+  "hash": String,
+  "parentHash": String,
+  "nonce": String,
+  "sha3Uncles": String,
+  "position":Number,
+  "blockNumber":Number,
+  "blockHash":String,
+  "logsBloom": String,
+  "transactionsRoot": String,
+  "stateRoot": String,
+  "receiptRoot": String,
+  "miner": String,
+  "difficulty": String,
+  "totalDifficulty": String,
+  "size": Number,
+  "extraData": String,
+  "gasLimit": Number,
+  "gasUsed": Number,
+  "timestamp": Number,
+  "blockTime": Number,
+  "uncles": [String]
+});
 // create indices
 Transaction.index({timestamp:-1});
 Transaction.index({blockNumber:-1});
@@ -83,17 +113,22 @@ Account.index({balance:-1});
 Account.index({balance:-1, blockNumber:-1});
 Block.index({miner:1});
 Block.index({miner:1, blockNumber:-1});
+Uncle.index({miner:1});
+Uncle.index({miner:1, blockNumber:-1});
+
 
 mongoose.model('BlockStat', BlockStat);
 mongoose.model('Block', Block);
 mongoose.model('Account', Account);
 mongoose.model('Contract', Contract);
 mongoose.model('Transaction', Transaction);
+mongoose.model('Uncle', Uncle);
 module.exports.BlockStat = mongoose.model('BlockStat');
 module.exports.Block = mongoose.model('Block');
 module.exports.Contract = mongoose.model('Contract');
 module.exports.Transaction = mongoose.model('Transaction');
 module.exports.Account = mongoose.model('Account');
+module.exports.Uncle = mongoose.model('Uncle');
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/blockDB');
 

@@ -254,7 +254,7 @@ exports.data = function(req, res){
       console.error("Invalid Request: " + action)
       res.status(400).send();
     }
-  } else {
+  }else {
     console.error("Invalid Request: " + action)
     res.status(400).send();
   }

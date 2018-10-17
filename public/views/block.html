@@ -16,7 +16,7 @@
           <tr ><td width="25%">Difficulty</td><td>{{block.difficulty | totalDifficulty}}</td></tr>
           <tr ><td width="25%">Total Difficulty</td><td>{{block.totalDifficulty | teraHashes | number}} TH</td></tr>
           <tr ><td width="25%">Gas Limit</td><td>{{block.gasLimit | number}}</td></tr>
-          <tr ><td width="25%">Gas Used</td><td>{{block.gasUsed | number}}</td></tr>
+          <tr ><td width="25%">Gas Used</td><td>{{block.gasUsed | number}} ({{(block.gasUsed * 100 /block.gasLimit).toString().substr(0,5)}}%)</td></tr>
           <tr ><td width="25%">nonce</td><td>{{block.nonce}}</td></tr>
           <tr ><td width="25%">Extra Data</td><td>{{block.extraData}}</td></tr>
           <tr ng-show="block.uncles.length > 0"><td width="25%">Uncles</td><td>{{block.uncles.length}} uncles

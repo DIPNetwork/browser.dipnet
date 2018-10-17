@@ -13,6 +13,9 @@ img.logo-default {
 .truncate-addrhash {
     max-width:200px;   
 }
+.green{
+    color: green;
+}
 .scrollable {
     max-height: 400px;
     overflow-y: scroll;

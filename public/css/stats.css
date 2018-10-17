@@ -27,6 +27,7 @@ path {
     stroke-opacity: 0.7;
     shape-rendering: crispEdges;
 }
+
 .grid path {
     stroke-width: 0;
 }
@@ -46,41 +47,41 @@ path {
     stroke: steelblue;
 }
 
-    path.slice{
-        stroke-width:2px;
-        stroke: #3a3a3a;
-        opacity: .7;
-    }
+path.slice {
+    stroke-width: 2px;
+    stroke: #3a3a3a;
+    opacity: .7;
+}
 
-    polyline{
-        opacity: .3;
-        stroke: black;
-        stroke-width: 2px;
-        fill: none;
-    }
+polyline {
+    opacity: .3;
+    stroke: black;
+    stroke-width: 2px;
+    fill: none;
+}
 
-    .labelValue
-    {
-        font-size: 60%;
-        opacity: .5;
+.labelValue {
+    font-size: 60%;
+    opacity: .5;
 
-    }
+}
 
-    .toolTip {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        position: absolute;
-        display: none;
-        width: auto;
-        height: auto;
-        background: none repeat scroll 0 0 white;
-        border: 0 none;
-        border-radius: 8px 8px 8px 8px;
-        box-shadow: -3px 3px 15px #888888;
-        color: black;
-        font: 12px sans-serif;
-        padding: 5px;
-        text-align: center;
-    }
-    text {
-        font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
+.toolTip {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    position: absolute;
+    display: none;
+    width: auto;
+    height: auto;
+    background: none repeat scroll 0 0 white;
+    border: 0 none;
+    border-radius: 8px 8px 8px 8px;
+    box-shadow: -3px 3px 15px #888888;
+    color: black;
+    font: 12px sans-serif;
+    padding: 5px;
+    text-align: center;
+}
+
+text {
+    font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}

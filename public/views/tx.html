@@ -1,53 +1,95 @@
 <!-- BEGIN PAGE CONTENT-->
 <div class="row">
-  <div class="col-md-12 portlet light">
-      <div class="portlet-body">
+    <div class="col-md-12 portlet light">
+        <div class="portlet-body">
 
-        <table class="col-md-6 table table-hover">
-          
-          <tr ><td width="25%">hash</td><td>{{tx.hash}}</td></tr>
-          <tr ><td width="25%">blockNumber</td>
-                <td><a href="/block/{{tx.blockNumber}}">{{tx.blockNumber}}</a></td>
-          </tr>
-          <tr ><td width="25%">Time</td>
-                <td>{{tx.datetime | date:'yyyy-MM-dd HH:mm:ss Z' }} ({{tx.timestamp | timeDuration}} ago)</td>
-          </tr>
-          <tr ><td width="25%">from</td>
-                <td><a href="/addr/{{tx.from}}">{{tx.from}}</a></td></tr>
-          <tr ng-show="tx.to"><td width="25%">to</td>
-                <td><a href="/addr/{{tx.to}}">{{tx.to}}</a></td></tr>
-          <tr ng-show="tx.creates"><td width="25%">creates</td>
-                <td><a href="/addr/{{tx.creates}}">{{tx.creates}}</a></td></tr>                
-          <tr ><td width="25%">value</td><td>{{tx.value}} {{ settings.symbol }}</td></tr>
-          <tr ><td width="25%">gas Provided</td><td>{{tx.gas | number}}</td></tr>
-          <tr ><td width="25%">gasPrice</td><td>{{tx.gasPrice | number}}</td></tr>
-          <tr ><td width="25%">nonce & potion</td><td>{{tx.nonce}} | { {{tx.transactionIndex}} }</td></tr>
-          <tr ><td width="25%">Input Data</td><td><pre class="code">{{tx.input}}</pre></td></tr>
-        </table>
+            <table class="col-md-6 table table-hover">
 
-        <table class="table table-condensed" ng-show="tx.isTrace">
-          <thead>
-              <tr>
-                  <th> From </th>
-                  <th> To </th>
-                  <th style="text-align:right"> Amount </th>
-                  <th style="text-align:right"> Gas </th>
-                  <th style="text-align:right"> GasUsed </th>
-                  <th></th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr ng-repeat="t in internal_transactions track by $index">
-                  <td class="truncate-addrhash"> <a href="/addr/{{t.from}}">{{t.from}}</a> </td>
-                  <td class="truncate-addrhash"> <a href="/addr/{{t.to}}">{{t.to}}</a> </td>
-                  <td style="text-align:right"> {{t.value}} </td>
-                  <td style="text-align:right"> {{t.gas}} </td>
-                  <td style="text-align:right"> {{t.gasUsed}} </td>
-                  <td style="text-align:center"><span class="label label-sm label-info {{t.type}}"> {{t.type}}</span><span class="label label-sm label-danger" ng-show="t.error"> {{t.error}}</span></td>
-              </tr>
-          </tbody>
-        </table>
+                <tr>
+                    <td width="25%">Hash</td>
+                    <td>{{tx.hash}}</td>
+                </tr>
+                <tr>
+                    <td width="25%">TxReceipt Status</td>
+                    <td style="color: green;" ng-if="tx.status == '0x1'">Success</td>
+                    <td style="color: red" ng-if="tx.status == '0x0'">Fail</td>
+                </tr>
+                <tr>
+                    <td width="25%">BlockNumber</td>
+                    <td><a href="/block/{{tx.blockNumber}}">{{tx.blockNumber}} </a>({{tx.confirmations}} Block Confirmations)</td>
+                </tr>
+                <tr>
+                    <td width="25%">Time</td>
+                    <td>{{tx.datetime | date:'yyyy-MM-dd HH:mm:ss Z' }} ({{tx.timestamp | timeDuration}} ago)</td>
+                </tr>
+                <tr>
+                    <td width="25%">From</td>
+                    <td><a href="/addr/{{tx.from}}">{{tx.from}}</a></td>
+                </tr>
+                <tr ng-show="tx.to">
+                    <td width="25%">To</td>
+                    <td>
+                        <span ng-show="tx.isCall || tx.isCreate"><span ng-show="tx.contractAddress">[</span>Contract </span>
+                        <a href="/addr/{{tx.to}}">{{tx.to}}</a>
+                        <span ng-show="tx.contractAddress"> Created] </span><i class="fa fa-check-circle-o green" ng-show="tx.isCall || tx.isCreate"></i></td>
+                </tr>
+                <tr>
+                    <td width="25%">Value</td>
+                    <td>{{tx.value}} {{ settings.symbol }}</td>
+                </tr>
+                <tr>
+                    <td width="25%">Gas Limit</td>
+                    <td>{{tx.gas}}</td>
+                </tr>
+                <tr>
+                    <td width="25%">Gas Used By Transaction</td>
+                    <td>{{tx.gasUsed}}</td>
+                </tr>
+                <tr>
+                    <td width="25%">gasPrice</td>
+                    <td>{{tx.gasPrice}} DPN ({{tx.gasPrice * 1000000000}} Gwei)</td>
+                </tr>
+                <tr>
+                    <td width="25%">Actual Tx Fee:</td>
+                    <td>{{tx.gasUsed * tx.gasPrice}} DPN</td>
+                </tr>
+                <tr>
+                    <td width="25%">nonce & potion</td>
+                    <td>{{tx.nonce}} | { {{tx.transactionIndex}} }</td>
+                </tr>
+                <tr>
+                    <td width="25%">Input Data</td>
+                    <td>
+                        <pre class="code">{{tx.input}}</pre>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table table-condensed" ng-show="tx.isTrace">
+                <thead>
+                <tr>
+                    <th> From</th>
+                    <th> To</th>
+                    <th style="text-align:right"> Amount</th>
+                    <th style="text-align:right"> Gas</th>
+                    <th style="text-align:right"> GasUsed</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="t in internal_transactions track by $index">
+                    <td class="truncate-addrhash"><a href="/addr/{{t.from}}">{{t.from}}</a></td>
+                    <td class="truncate-addrhash"><a href="/addr/{{t.to}}">{{t.to}}</a></td>
+                    <td style="text-align:right"> {{t.value}}</td>
+                    <td style="text-align:right"> {{t.gas}}</td>
+                    <td style="text-align:right"> {{t.gasUsed}}</td>
+                    <td style="text-align:center"><span
+                            class="label label-sm label-info {{t.type}}"> {{t.type}}</span><span
+                            class="label label-sm label-danger" ng-show="t.error"> {{t.error}}</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
-
-  </div>
 </div>

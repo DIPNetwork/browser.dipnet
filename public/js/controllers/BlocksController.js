@@ -1,12 +1,4 @@
 angular.module('BlocksApp').controller('BlocksController', function($stateParams, $rootScope, $scope, $http, $location) {
-  console.log('Blocks')
-  $http({
-    method: 'POST',
-    url: '/blocks',
-    data: {'page':1,size:10}
-  }).success(function(data) {
-    console.log(data)
-  });
   $scope.data = {};
   var fetchUncles = function() {
     var table = $("#table_blocks").DataTable({
@@ -44,7 +36,7 @@ angular.module('BlocksApp').controller('BlocksController', function($stateParams
             return getDuration(row.timestamp).toString();
           }, "targets": [1]},
         { "render": function(data, type, row) {
-            return '<a href="/transaction?block='+row.number+'">'+0+'</a>'
+            return '<a href="/transaction?block='+row.number+'">'+row.transactions+'</a>'
           }, "targets": [2]},
         { "render": function(data, type, row) {
             return row.uncles.length;
@@ -53,7 +45,7 @@ angular.module('BlocksApp').controller('BlocksController', function($stateParams
             return'<a href="/addr/'+row.miner+'">'+row.miner.substr(0,10)+'...</a>'
           }, "targets": [4]},
         { "render": function(data, type, row) {
-            return row.gasUsed;
+            return row.gasUsed + ' ('+ (row.gasUsed * 100 /row.gasLimit).toString().substr(0,5) +'%)';
           }, "targets": [5]},
         { "render": function(data, type, row) {
             return row.gasLimit;
@@ -62,7 +54,7 @@ angular.module('BlocksApp').controller('BlocksController', function($stateParams
             return row.gasLimit;
           }, "targets": [7]},
         { "render": function(data, type, row) {
-            return row.gasLimit;
+            return row.gasUsed;
           }, "targets": [8]},
       ]
     });

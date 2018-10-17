@@ -169,6 +169,7 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
       var txData = blockData.transactions[d];
       txData.timestamp = blockData.timestamp;
       txData.value = etherUnits.toEther(new BigNumber(txData.value), 'wei');
+      txData.gasPrice = etherUnits.toEther(new BigNumber(txData.gasPrice), 'wei');
       let receipt = await getTxReceipt(txData.hash);
       if(receipt != null){
         txData.cumulativeGasUsed = receipt.cumulativeGasUsed;

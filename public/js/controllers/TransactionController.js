@@ -1,12 +1,11 @@
 angular.module('BlocksApp').controller('TransactionController', function ($stateParams, $rootScope, $scope, $http, $location) {
     $scope.data = {};
-    console.log($location.search())
     $scope.queryInfo = {};
-    if ('addr' in $location.search()) {
-        $scope.queryInfo.addr = $location.search().addr;
+    if('addr' in  $location.search()){
+        $scope.queryInfo.addr = $scope.queryInfo.addr;
     }
-    if ('block' in $location.search()) {
-        $scope.queryInfo.block = $location.search().block;
+    if('block' in  $location.search()){
+        $scope.queryInfo.addr = $scope.queryInfo.block;
     }
     var fetchUncles = function () {
         var table = $("#table_transactions").DataTable({
@@ -14,13 +13,19 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
             serverSide: true,
             paging: true,
             searching: false,
+            stateSave:true,
+            stateSaveCallback:function(settings,data){
+                sessionStorage.setItem('txs_'+ settings.sInstance, JSON.stringify(data))
+            },
+            stateLoadCallback:function(settings){
+                return JSON.parse(sessionStorage.getItem('txs_'+settings.sInstance));
+            },
             ajax: function (data, callback, settings) {
                 let sql = '';
                 if ('addr' in $scope.queryInfo || 'block' in $scope.queryInfo) {
                     sql = '&' + Object.keys($scope.queryInfo)[0] + '=' + Object.values($scope.queryInfo)[0];
                 }
-                $http.get(`/tx?page=${Math.ceil(data.start / data.length) + 1}&size=${data.length}${sql}`).then(function (list) {
-                    $location.search('page', Math.ceil(data.start / data.length) + 1);
+                $http.post('/tx',{page:Math.ceil(data.start / data.length) + 1,size:data.length,...sql}).then(function (list) {
                     // save data
                     data.count = list.data.length;
                     $scope.data.data = [...list.data.data];
@@ -64,6 +69,9 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
                 },
                 {
                     "render": function (data, type, row) {
+                        if(row.to == null){
+                            row.to = row.contractAddress;
+                        }
                         return '<a href="/addr/' + row.to + '" title="' + row.to + '">' + row.to.substr(0, 10) + '...</a>'
                     }, "targets": [4]
                 },
@@ -81,4 +89,5 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
         });
     };
     fetchUncles();
+
 });

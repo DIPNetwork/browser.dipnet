@@ -42,7 +42,7 @@
         <div class="hor-menu hor-menu-light">
             <ul class="nav navbar-nav">
                 <li class="">
-                    <a href="/">Home</a>
+                    <a href="/home">Home</a>
                 </li>
                 <li class="menu-dropdown classic-menu-dropdown">
                     <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> BLOCKCHAIN
@@ -50,19 +50,19 @@
                     </a>
                     <ul class="dropdown-menu pull-left">
                         <li>
-                            <a ui-sref="transaction" ui-sref-opts="{reload:true}">
+                            <a ng-click="go('transaction')" ui-sref-opts="{reload:true}">
                                 <i></i>
                                 View Txns
                             </a>
                         </li>
                         <li>
-                            <a href="/blocks">
+                            <a ng-click="go('blocks')" ui-sref-opts="{reload:true}">
                                 <i></i>
                                 View Blocks
                             </a>
                         </li>
                         <li>
-                            <a href="/uncles">
+                            <a ng-click="go('uncles')" ui-sref-opts="{reload:true}">
                                 <i></i>
                                 View Uncles
                             </a>

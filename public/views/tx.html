@@ -29,9 +29,9 @@
                 <tr ng-show="tx.to">
                     <td width="25%">To</td>
                     <td>
-                        <span ng-show="tx.isCall || tx.isCreate"><span ng-show="tx.contractAddress">[</span>Contract </span>
+                        <span ng-show="isCall || isCreate"><span ng-show="tx.contractAddress">[</span>Contract </span>
                         <a href="/addr/{{tx.to}}">{{tx.to}}</a>
-                        <span ng-show="tx.contractAddress"> Created] </span><i class="fa fa-check-circle-o green" ng-show="tx.isCall || tx.isCreate"></i></td>
+                        <span ng-show="tx.contractAddress"> Created] </span><i class="fa fa-check-circle-o green" ng-show="isCall || isCreate"></i></td>
                 </tr>
                 <tr>
                     <td width="25%">Value</td>

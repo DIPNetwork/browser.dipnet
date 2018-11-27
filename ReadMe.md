@@ -1,1 +1,0 @@
-#### A dipnet blockchain browser.

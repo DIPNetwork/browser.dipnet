@@ -454,7 +454,7 @@ catch (error) {
 }
 // set the default NODE address to localhost if it's not provided
 if (!('nodeAddr' in config) || !(config.nodeAddr)) {
-  config.nodeAddr = 'localhost'; // default
+  config.nodeAddr = 'http://192.168.1.199:8545'; // default
 }
 // set the default geth port if it's not provided
 if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
@@ -472,7 +472,7 @@ console.log('Connecting ' + config.nodeAddr + ':' + config.gethPort + '...');
 
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
 // var web3 = new Web3(new Web3.providers.HttpProvider('http://' + config.nodeAddr + ':' + config.gethPort.toString()));
-var web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/01df338814a24d9bbb0d25b621758aa1'));
+var web3 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.199:8545'));
 
 // patch missing blocks
 if (config.patch === true) {

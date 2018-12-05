@@ -267,22 +267,28 @@ angular.module('BlocksApp').controller('AddressController', function ($statePara
             $scope.internal_transactions = resp.data;
         });
     }
+                    //从自定义指令提出了http请求
+    $http({
+        method: 'POST',
+        url: '/compile',
+        data: {"addr": $scope.addrHash, "action": "find"}
+    }).then(function (resp) {
+        console.log(resp.data);
+        $scope.contract = resp.data;
+    });
+
 })
     .directive('contractSource', function ($http) {
         return {
             restrict: 'E',
             templateUrl: '/views/contract-source.html',
             scope: false,
-            link: function (scope, elem, attrs) {
-                //fetch contract stuff
-                $http({
-                    method: 'POST',
-                    url: '/compile',
-                    data: {"addr": scope.addrHash, "action": "find"}
-                }).then(function (resp) {
-                    console.log(resp.data);
-                    scope.contract = resp.data;
-                });
-            }
+        }
+    })
+    .directive('templateSource', function ($http) {
+        return {
+            restrict: 'E',
+            templateUrl: '/views/template-source.html',
+            scope: false,
         }
     })

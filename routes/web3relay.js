@@ -17,6 +17,7 @@ var getLatestBlocks = require('./index').getLatestBlocks;
 var filterBlocks = require('./filters').filterBlocks;
 var filterTrace = require('./filters').filterTrace;
 var Transaction = mongoose.model('Transaction');
+var request = require('request');
 
 /*Start config for node connection and sync*/
 var config = {};
@@ -50,7 +51,7 @@ if (typeof web3 !== "undefined") {
     web3 = new Web3(web3.currentProvider);
 } else {
     // web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.nodeAddr+':'+config.gethPort));
-    web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/01df338814a24d9bbb0d25b621758aa1'));
+    web3 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.199:8545'));
 
 }
 
@@ -181,11 +182,7 @@ exports.data =async function (req, res) {
         }
         if (options.indexOf("bytecode") > -1) {
             try {
-                addrData["bytecode"] = web3.eth.getCode(addr);
-                if (addrData["bytecode"].length > 2)
-                    addrData["isContract"] = true;
-                else
-                    addrData["isContract"] = false;
+                addrData["detail"] = JSON.parse(await getIsTemplate(addr)).result;
             } catch (err) {
                 console.error("AddrWeb3 error :" + err);
                 addrData = {"error": true};
@@ -301,6 +298,17 @@ function getBlockNumber() {
         web3.eth.getBlockNumber(function (err, block) {
             if (!err) {
                 resolve(block);
+            }
+        })
+    })
+}
+function getIsTemplate(addr){
+    return new Promise((resolve,reject)=>{
+        request({url:'http://192.168.1.199:8545',method:'POST', headers: {
+                "content-type": "application/json",
+            },body:JSON.stringify({"jsonrpc":"2.0","method":"eth_getDetail","params":[addr,"latest"],"id":83})},function (error,response,body) {
+            if(!error){
+                resolve(body);
             }
         })
     })

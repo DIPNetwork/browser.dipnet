@@ -68,7 +68,7 @@ if (web3.version.node.split('/')[0].toLowerCase().includes('parity')) {
 var newBlocks = web3.eth.filter("latest");
 var newTxs = web3.eth.filter("pending");
 
-exports.data =async function (req, res) {
+exports.data = async function (req, res) {
     console.log(req.body)
     if ("tx" in req.body) {
         let latestNumber = await getBlockNumber();

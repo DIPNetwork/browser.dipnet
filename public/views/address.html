@@ -74,6 +74,9 @@
                     <li ng-class="{active: activeTab == 'tab_addr_5' || !activeTab}" ng-show="addr.isMined">
                         <a href="#tab_addr_5" data-toggle="tab" aria-expanded="true"> Mined Uncles </a>
                     </li>
+                    <li class="" ng-show="addr.detail.type === 'template'" ng-class="{active: activeTab == 'tab_addr_6'}">
+                        <a href="#tab_addr_6" data-toggle="tab" aria-expanded="false"> Template </a>
+                    </li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane table-container" ng-class="{active: activeTab == 'tab_addr_1' || !activeTab}"
@@ -160,6 +163,10 @@
                             </thead>
                             <tbody></tbody>
                         </table>
+                    </div>
+                    <div class="tab-pane" id="tab_addr_6" ng-show="addr.detail.type === 'template'"
+                         ng-class="{active: activeTab == 'tab_addr_6'}">
+                        <template-source></template-source>
                     </div>
                 </div>
             </div>

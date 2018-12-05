@@ -15,15 +15,15 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
       url: '/web3relay',
       data: {"tx": $scope.hash}
     }).success(function(data) {
-      // if (data.error) {
-      //   if (data.isBlock) {
-      //     // this is a blockHash
-      //     $location.path("/block/" + $scope.hash);
-      //     return;
-      //   }
-      //   $location.path("/err404/tx/" + $scope.hash);
-      //   return;
-      // }
+      if (data.error) {
+        if (data.isBlock) {
+          // this is a blockHash
+          $location.path("/block/" + $scope.hash);
+          return;
+        }
+        $location.path("/err404/tx/" + $scope.hash);
+        return;
+      }
       $scope.tx = data.tx;
       $scope.isCreate = data.isCreate;
       $scope.isCall = data.isCall;

@@ -39,7 +39,7 @@ catch (error) {
 
 // set the default NODE address to localhost if it's not provided
 if (!('nodeAddr' in config) || !(config.nodeAddr)) {
-    config.nodeAddr = 'localhost'; // default
+    config.nodeAddr = 'http://192.168.1.199:8545'; // default
 }
 // set the default geth port if it's not provided
 if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {

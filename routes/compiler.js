@@ -8,14 +8,17 @@ var Contract = require('./contracts');
 /* 
   TODO: support other languages
 */
-module.exports = function(req, res) {
+module.exports = async function(req, res) {
   console.log(req.body);
   if (!("action" in req.body))
     res.status(400).send();
   if (req.body.action=="compile") {
     compileSolc(req, res);
   } else if (req.body.action=="find") {
-    Contract.findContract(req.body.addr, res);
+    // Contract.findContract(req.body.addr, res);
+      let byteCode = await eth.getCode(req.body.addr);
+      res.write(JSON.stringify({byteCode}));
+      res.end();
   }
 
 }

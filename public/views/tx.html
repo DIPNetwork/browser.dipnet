@@ -43,7 +43,14 @@
                 </tr>
                 <tr>
                     <td width="25%">Gas Used By Transaction</td>
-                    <td>{{tx.gasUsed}}</td>
+                    <td>
+                        <span>{{tx.gasUsed}}</span>
+                        <span> ( </span>
+                        <span class='hoverTip Tip-up' data-msg='Developer'>{{tx.gasDeveloper}}</span>
+                        <span> + </span>
+                        <span class='hoverTip Tip-up' data-msg='gasMiner'>{{tx.gasMiner}}</span>
+                        <span> )</span>
+                    </td>
                 </tr>
                 <tr>
                     <td width="25%">gasPrice</td>
@@ -62,6 +69,10 @@
                     <td>
                         <pre class="code">{{tx.input}}</pre>
                     </td>
+                </tr>
+                <tr>
+                    <td width="25%">Template Address</td>
+                    <td>{{tx.templateAddress ? tx.templateAddress : '0x0'}}</td>
                 </tr>
             </table>
 

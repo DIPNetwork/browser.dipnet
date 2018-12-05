@@ -21,13 +21,16 @@
                                 class="fa fa-external-link"></i></a>
                         </div>
                         <div class="margin-top-20">
-                            {{ addr.mined }} <span class="eth-stat-text">Mined</span>
+                            <span class="eth-stat-text">Mined</span> {{ addr.mined }} 
                         </div>
                         <div class="margin-top-20">
-                            {{ addr.count }} <span class="eth-stat-text">Transactions</span>
+                            <span class="eth-stat-text">Transactions</span> {{ addr.count }} 
                         </div>
                         <div class="margin-top-20">
-                            {{ addr.uncles }} <span class="eth-stat-text">Uncles</span>
+                            <span class="eth-stat-text">Uncles</span> {{ addr.uncles }} 
+                        </div>
+                        <div class="margin-top-20" ng-show="addr.detail.type === 'contract'">
+                            <span class="eth-stat-text">Template</span> <a href="">{{ addr.detail.temAddress }}</a>
                         </div>
                     </div>
                 </div>
@@ -62,14 +65,14 @@
                     <li ng-class="{active: activeTab == 'tab_addr_2'}" ng-show="false">
                         <a href="#tab_addr_2" data-toggle="tab" aria-expanded="false"> Internal Transactions </a>
                     </li>
-                    <li class="" ng-show="addr.isContract" ng-class="{active: activeTab == 'tab_addr_3'}">
+                    <li class="" ng-show="addr.detail.type === 'contract'" ng-class="{active: activeTab == 'tab_addr_3'}">
                         <a href="#tab_addr_3" data-toggle="tab" aria-expanded="false"> Contract Source </a>
                     </li>
                     <li ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}" ng-show="addr.isMined">
                         <a href="#tab_addr_4" data-toggle="tab" aria-expanded="false"> Mined Blocks </a>
                     </li>
                     <li ng-class="{active: activeTab == 'tab_addr_5' || !activeTab}" ng-show="addr.isMined">
-                    <a href="#tab_addr_5" data-toggle="tab" aria-expanded="true"> Mined Uncles </a>
+                        <a href="#tab_addr_5" data-toggle="tab" aria-expanded="true"> Mined Uncles </a>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -121,7 +124,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="tab-pane" id="tab_addr_3" ng-show="addr.isContract"
+                    <div class="tab-pane" id="tab_addr_3" ng-show="addr.detail.type === 'contract'"
                          ng-class="{active: activeTab == 'tab_addr_3'}">
                         <contract-source></contract-source>
                     </div>

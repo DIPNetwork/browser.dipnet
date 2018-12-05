@@ -177,6 +177,9 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
         txData.contractAddress = receipt.contractAddress;
         txData.logs = receipt.logs;
         txData.status = receipt.status;
+        txData.templateAddress = receipt.templateAddress;
+        txData.gasDeveloper = receipt.gasDeveloper;
+        txData.gasMiner = receipt.gasMiner;
       }
       self.bulkOps.push(txData);
     }
@@ -454,7 +457,7 @@ catch (error) {
 }
 // set the default NODE address to localhost if it's not provided
 if (!('nodeAddr' in config) || !(config.nodeAddr)) {
-  config.nodeAddr = 'http://192.168.1.199:8545'; // default
+  config.nodeAddr = '192.168.1.199'; // default
 }
 // set the default geth port if it's not provided
 if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {

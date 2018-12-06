@@ -17,6 +17,7 @@ var getLatestBlocks = require('./index').getLatestBlocks;
 var filterBlocks = require('./filters').filterBlocks;
 var filterTrace = require('./filters').filterTrace;
 var Transaction = mongoose.model('Transaction');
+var request = require('request');
 
 /*Start config for node connection and sync*/
 var config = {};
@@ -49,9 +50,7 @@ if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
 if (typeof web3 !== "undefined") {
     web3 = new Web3(web3.currentProvider);
 } else {
-    // web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.nodeAddr+':'+config.gethPort));
-    web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/01df338814a24d9bbb0d25b621758aa1'));
-
+    web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.nodeAddr+':'+config.gethPort));
 }
 
 if (web3.isConnected())
@@ -67,67 +66,78 @@ if (web3.version.node.split('/')[0].toLowerCase().includes('parity')) {
 var newBlocks = web3.eth.filter("latest");
 var newTxs = web3.eth.filter("pending");
 
-exports.data =async function (req, res) {
+exports.data = async function (req, res) {
     console.log(req.body)
     if ("tx" in req.body) {
         let latestNumber = await getBlockNumber();
         var txHash = req.body.tx.toLowerCase();
-        let isCall,isCreate;
+        let isCall,isCreateCon,isCreateTem;
         Transaction.findOne({'hash': txHash}).exec(async function (err, doc) {
             if (!err) {
-                doc._doc.confirmations = latestNumber-doc._doc.blockNumber;
-                let byteCode = await web3.eth.getCode(doc.to);
-                if(/^0x/.test(byteCode) && byteCode.length > 2){
-                    if(doc._doc.contractAddress){
+                if(doc !== null){
+                    doc._doc.confirmations = latestNumber-doc._doc.blockNumber;
+                    if(doc._doc.to == null){
                         isCall = false;
-                        isCreate = true;
+                        isCreateCon = false;
+                        isCreateTem = true;
                     }else {
-                        isCreate = false;
-                        isCall = true;
+                        let type = JSON.parse(await getIsTemplate(doc._doc.to)).result.type;
+                        isCreateTem = false;
+                        switch (type){
+                            case 'template':
+                                isCreateCon = true;
+                                isCall = false;
+                                break;
+                            case 'contract':
+                                isCreateCon = false;
+                                isCall = true;
+                                break;
+                            case 'normal':
+                                isCreateCon = false;
+                                isCall = false;
+                                break;
+                        }
                     }
+                    res.write(JSON.stringify({tx:doc,isCall,isCreateCon,isCreateTem}));
+                    res.end();
                 }else {
-                    isCall = false;
-                    isCreate = false;
+                    web3.eth.getTransaction(txHash, function(err, tx) {
+                        if(err || !tx) {
+                            console.error("TxWeb3 error :" + err)
+                            if (!tx) {
+                                web3.eth.getBlock(txHash, function(err, block) {
+                                    if(err || !block) {
+                                        console.error("BlockWeb3 error :" + err)
+                                        res.write(JSON.stringify({"error": true}));
+                                    } else {
+                                        console.log("BlockWeb3 found: " + txHash)
+                                        res.write(JSON.stringify({"error": true, "isBlock": true}));
+                                    }
+                                    res.end();
+                                });
+                            } else {
+                                res.write(JSON.stringify({"error": true}));
+                                res.end();
+                            }
+                        } else {
+                            var ttx = tx;
+                            ttx.value = etherUnits.toEther( new BigNumber(tx.value), "wei");
+                            //get timestamp from block
+                            var block = web3.eth.getBlock(tx.blockNumber, function(err, block) {
+                                if (!err && block)
+                                    ttx.timestamp = block.timestamp;
+                                ttx.isTrace = (ttx.input != "0x");
+                                res.write(JSON.stringify(ttx));
+                                res.end();
+                            });
+                        }
+                    });
                 }
-                res.write(JSON.stringify({tx:doc,isCall,isCreate}));
-                res.end();
             } else {
                 res.write({});
                 res.end();
             }
         })
-        // web3.eth.getTransaction(txHash, function(err, tx) {
-        //   // if(err || !tx) {
-        //   //   console.error("TxWeb3 error :" + err)
-        //   //   if (!tx) {
-        //   //     web3.eth.getBlock(txHash, function(err, block) {
-        //   //       if(err || !block) {
-        //   //         console.error("BlockWeb3 error :" + err)
-        //   //         res.write(JSON.stringify({"error": true}));
-        //   //       } else {
-        //   //         console.log("BlockWeb3 found: " + txHash)
-        //   //         res.write(JSON.stringify({"error": true, "isBlock": true}));
-        //   //       }
-        //   //       res.end();
-        //   //     });
-        //   //   } else {
-        //   //     res.write(JSON.stringify({"error": true}));
-        //   //     res.end();
-        //   //   }
-        //   // } else {
-        //   //   var ttx = tx;
-        //   //   ttx.value = etherUnits.toEther( new BigNumber(tx.value), "wei");
-        //   //   //get timestamp from block
-        //   //   var block = web3.eth.getBlock(tx.blockNumber, function(err, block) {
-        //   //     if (!err && block)
-        //   //       ttx.timestamp = block.timestamp;
-        //   //     ttx.isTrace = (ttx.input != "0x");
-        //   //     res.write(JSON.stringify(ttx));
-        //   //     res.end();
-        //   //   });
-        //   // }
-        // });
-
     } else if ("tx_trace" in req.body) {
         var txHash = req.body.tx_trace.toLowerCase();
 
@@ -181,11 +191,7 @@ exports.data =async function (req, res) {
         }
         if (options.indexOf("bytecode") > -1) {
             try {
-                addrData["bytecode"] = web3.eth.getCode(addr);
-                if (addrData["bytecode"].length > 2)
-                    addrData["isContract"] = true;
-                else
-                    addrData["isContract"] = false;
+                addrData["detail"] = JSON.parse(await getIsTemplate(addr)).result;
             } catch (err) {
                 console.error("AddrWeb3 error :" + err);
                 addrData = {"error": true};
@@ -301,6 +307,17 @@ function getBlockNumber() {
         web3.eth.getBlockNumber(function (err, block) {
             if (!err) {
                 resolve(block);
+            }
+        })
+    })
+}
+function getIsTemplate(addr){
+    return new Promise((resolve,reject)=>{
+        request({url:'http://'+config.nodeAddr+':'+config.gethPort,method:'POST', headers: {
+                "content-type": "application/json",
+            },body:JSON.stringify({"jsonrpc":"2.0","method":"eth_getDetail","params":[addr,"latest"],"id":83})},function (error,response,body) {
+            if(!error){
+                resolve(body);
             }
         })
     })

@@ -42,8 +42,21 @@ var Contract = new Schema(
     "optimization": Boolean,
     "sourceCode": String,
     "abi": String,
-    "byteCode": String
+    "byteCode": String,
+    "templateAddress":String
 }, {collection: "Contract"});
+
+var Template = new Schema({
+    "address":{type:String,index:{unique:true}},
+    "coinBase":String,
+    "templateName":String,
+    "compilerVersion":String,
+    "compilerOption":String,
+    "sourceCode":String,
+    "abi":String,
+    "byteCode":String,
+    "instance":Array
+},{collection: "Template"})
 
 var Transaction = new Schema(
 {
@@ -123,12 +136,14 @@ mongoose.model('Account', Account);
 mongoose.model('Contract', Contract);
 mongoose.model('Transaction', Transaction);
 mongoose.model('Uncle', Uncle);
+mongoose.model('Template', Template);
 module.exports.BlockStat = mongoose.model('BlockStat');
 module.exports.Block = mongoose.model('Block');
 module.exports.Contract = mongoose.model('Contract');
 module.exports.Transaction = mongoose.model('Transaction');
 module.exports.Account = mongoose.model('Account');
 module.exports.Uncle = mongoose.model('Uncle');
+module.exports.Template = mongoose.model('Template');
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/blockDB');
 

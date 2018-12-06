@@ -17,6 +17,8 @@ var Block = mongoose.model('Block');
 var Transaction = mongoose.model('Transaction');
 var Account = mongoose.model('Account');
 var Uncle = mongoose.model('Uncle');
+var Contract = mongoose.model('Contract');
+var Template = mongoose.model('Template');
 /**
  //Just listen for latest blocks and sync from the start of the app.
  **/
@@ -177,6 +179,43 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
         txData.contractAddress = receipt.contractAddress;
         txData.logs = receipt.logs;
         txData.status = receipt.status;
+        txData.templateAddress = receipt.templateAddress;
+        txData.gasDeveloper = receipt.gasDeveloper;
+        txData.gasMiner = receipt.gasMiner;
+        if(txData.contractAddress != null){
+          let contractObj = {creationTransaction:txData.hash,address:txData.contractAddress,templateAddress:txData.to,byteCode:await web3.eth.getCode(txData.contractAddress)};
+            Contract.collection.insert([contractObj], function (err, contract) {
+                if (typeof err !== 'undefined' && err) {
+                    if (err.code == 11000) {
+                        if (!('quiet' in config && config.quiet === true)) {
+                            console.log('Skip: Duplicate DB key : ' + err);
+                        }
+                    } else {
+                        console.log('Error: Aborted due to error on DB: ' + err);
+                        process.exit(9);
+                    }
+                } else {
+                    console.log('* ' + contract.insertedCount + ' contracts successfully written.');
+                }
+            });
+        };
+        if(txData.templateAddress != null){
+          let templateObj = {address:txData.templateAddress,coinBase:'0x'+txData.input.substr(-40),byteCode:await web3.eth.getCode(txData.templateAddress)};
+          Template.collection.insert([templateObj], function (err, template) {
+              if (typeof err !== 'undefined' && err) {
+                  if (err.code == 11000) {
+                      if (!('quiet' in config && config.quiet === true)) {
+                          console.log('Skip: Duplicate DB key : ' + err);
+                      }
+                  } else {
+                      console.log('Error: Aborted due to error on DB: ' + err);
+                      process.exit(9);
+                  }
+              } else {
+                  console.log('* ' + template.insertedCount + ' templates successfully written.');
+              }
+            });
+        }
       }
       self.bulkOps.push(txData);
     }
@@ -210,49 +249,49 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
     if (bulk.length == 0 && accounts.length == 0) return;
 
     // update balances
-    if (accounts.length > 0)
-      async.eachSeries(accounts, function (account, eachCallback) {
-        var blockNumber = data[account].blockNumber;
-        // get contract account type
-        web3.eth.getCode(account, function (err, code) {
-          if (err) {
-            console.log("ERROR: fail to getCode(" + account + ")");
-            return eachCallback(err);
-          }
-          if (code.length > 2) {
-            data[account].type = 1; // contract type
-          }
-
-          web3.eth.getBalance(account, blockNumber, function (err, balance) {
-            if (err) {
-              console.log("ERROR: fail to getBalance(" + account + ")");
-              return eachCallback(err);
-            }
-
-            //data[account].balance = web3.fromWei(balance, 'ether');
-            let ether;
-            if (typeof balance === 'object') {
-              ether = parseFloat(balance.div(1e18).toString());
-            } else {
-              ether /= 1e18;
-            }
-            data[account].balance = ether;
-            eachCallback();
-          });
-        });
-      }, function (err) {
-        var n = 0;
-        accounts.forEach(function (account) {
-          n++;
-          if (n <= 5) {
-            console.log(' - upsert ' + account + ' / balance = ' + data[account].balance);
-          } else if (n == 6) {
-            console.log('   (...) total ' + accounts.length + ' accounts updated.');
-          }
-          // upsert account
-          Account.collection.update({address: account}, {$set: data[account]}, {upsert: true});
-        });
-      });
+    // if (accounts.length > 0)
+    //   async.eachSeries(accounts, function (account, eachCallback) {
+    //     var blockNumber = data[account].blockNumber;
+    //     // get contract account type
+    //     web3.eth.getCode(account, function (err, code) {
+    //       if (err) {
+    //         console.log("ERROR: fail to getCode(" + account + ")");
+    //         return eachCallback(err);
+    //       }
+    //       if (code.length > 2) {
+    //         data[account].type = 1; // contract type
+    //       }
+    //
+    //       web3.eth.getBalance(account, blockNumber, function (err, balance) {
+    //         if (err) {
+    //           console.log("ERROR: fail to getBalance(" + account + ")");
+    //           return eachCallback(err);
+    //         }
+    //
+    //         //data[account].balance = web3.fromWei(balance, 'ether');
+    //         let ether;
+    //         if (typeof balance === 'object') {
+    //           ether = parseFloat(balance.div(1e18).toString());
+    //         } else {
+    //           ether /= 1e18;
+    //         }
+    //         data[account].balance = ether;
+    //         eachCallback();
+    //       });
+    //     });
+    //   }, function (err) {
+    //     var n = 0;
+    //     accounts.forEach(function (account) {
+    //       n++;
+    //       if (n <= 5) {
+    //         console.log(' - upsert ' + account + ' / balance = ' + data[account].balance);
+    //       } else if (n == 6) {
+    //         console.log('   (...) total ' + accounts.length + ' accounts updated.');
+    //       }
+    //       // upsert account
+    //       Account.collection.update({address: account}, {$set: data[account]}, {upsert: true});
+    //     });
+    //   });
 
     if (bulk.length > 0)
       Transaction.collection.insert(bulk, function (err, tx) {
@@ -471,8 +510,7 @@ if (!('bulkSize' in config) || (typeof config.bulkSize) !== 'number') {
 console.log('Connecting ' + config.nodeAddr + ':' + config.gethPort + '...');
 
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
-// var web3 = new Web3(new Web3.providers.HttpProvider('http://' + config.nodeAddr + ':' + config.gethPort.toString()));
-var web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/01df338814a24d9bbb0d25b621758aa1'));
+var web3 = new Web3(new Web3.providers.HttpProvider('http://' + config.nodeAddr + ':' + config.gethPort.toString()));
 
 // patch missing blocks
 if (config.patch === true) {
@@ -481,7 +519,7 @@ if (config.patch === true) {
 }
 
 // Start listening for latest blocks
-// listenBlocks(config);
+listenBlocks(config);
 
 // Starts full sync when set to true in config
 if (config.syncAll === true) {

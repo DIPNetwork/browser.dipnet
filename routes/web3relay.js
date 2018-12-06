@@ -39,7 +39,7 @@ catch (error) {
 
 // set the default NODE address to localhost if it's not provided
 if (!('nodeAddr' in config) || !(config.nodeAddr)) {
-    config.nodeAddr = 'http://192.168.1.199:8545'; // default
+    config.nodeAddr = 'localhost'; // default
 }
 // set the default geth port if it's not provided
 if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
@@ -50,9 +50,7 @@ if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
 if (typeof web3 !== "undefined") {
     web3 = new Web3(web3.currentProvider);
 } else {
-    // web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.nodeAddr+':'+config.gethPort));
-    web3 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.199:8545'));
-
+    web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.nodeAddr+':'+config.gethPort));
 }
 
 if (web3.isConnected())
@@ -315,7 +313,7 @@ function getBlockNumber() {
 }
 function getIsTemplate(addr){
     return new Promise((resolve,reject)=>{
-        request({url:'http://192.168.1.199:8545',method:'POST', headers: {
+        request({url:'http://'+config.nodeAddr+':'+config.gethPort,method:'POST', headers: {
                 "content-type": "application/json",
             },body:JSON.stringify({"jsonrpc":"2.0","method":"eth_getDetail","params":[addr,"latest"],"id":83})},function (error,response,body) {
             if(!error){

@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-md-6 center">
                     <div>
-                <span class="eth-stat-title">
+                        <span class="eth-stat-title">
                   {{ addr.balance | number: 10 }} </span><br>
                         <span class="eth-stat-text">
                   {{ settings.symbol }} Balance <i class="fa fa-question-circle" data-toggle="tooltip"
@@ -21,20 +21,23 @@
                                 class="fa fa-external-link"></i></a>
                         </div>
                         <div class="margin-top-20">
-                            <span class="eth-stat-text">Mined</span> {{ addr.mined }} 
+                            <span class="eth-stat-text">Mined</span> {{ addr.mined }}
                         </div>
                         <div class="margin-top-20">
-                            <span class="eth-stat-text">Transactions</span> {{ addr.count }} 
+                            <span class="eth-stat-text">Transactions</span> {{ addr.count }}
                         </div>
                         <div class="margin-top-20">
-                            <span class="eth-stat-text">Uncles</span> {{ addr.uncles }} 
+                            <span class="eth-stat-text">Uncles</span> {{ addr.uncles }}
                         </div>
-                        <div class="margin-top-20" ng-show="addr.detail.type === 'contract'">
-                            <span class="eth-stat-text">Template</span> <a href="">{{ addr.detail.temAddress }}</a>
+                        <div class="margin-top-20" ng-show="addr.detail.type === 'template' && addr.detail.temAddress">
+                            <span class="eth-stat-text">Template</span> 
+                            <a href="/addr/{{addr.detail.temAddress}}">{{ addr.detail.temAddress }}</a>
                         </div>
+                        <div class="margin-top-20" ng-show="addr.detail.type === 'template'&& addr.detail.coinbase"">
+                            <span class="eth-stat-text">Author</span> {{ addr.coinbase }}
+                        </div>           
                     </div>
                 </div>
-
                 <div class="col-md-6 center">
                     <div class="portlet">
                         <div class="portlet-body">
@@ -49,11 +52,12 @@
                         </div>
                     </div>
                 </div>
-
-            </div><!--end row-->
-        </div><!--end portlet-body-->
-    </div><!--end portlet-->
-
+            </div>
+            <!--end row-->
+        </div>
+        <!--end portlet-body-->
+    </div>
+    <!--end portlet-->
     <!-- Begin: Transaction Datatable -->
     <div class="portlet light portlet-datatable col-md-12">
         <div class="portlet-body">
@@ -79,98 +83,89 @@
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane table-container" ng-class="{active: activeTab == 'tab_addr_1' || !activeTab}"
-                         id="tab_addr_1"><!-- Datatable tab -->
-
-                        <table class="table table-striped table-hover" id="table_txs"
-                               style="table-layout:fixed;width: 98% !important;">
+                    <div class="tab-pane table-container" ng-class="{active: activeTab == 'tab_addr_1' || !activeTab}" id="tab_addr_1">
+                        <!-- Datatable tab -->
+                        <table class="table table-striped table-hover" id="table_txs" style="table-layout:fixed;width: 98% !important;">
                             <thead>
-                            <tr role="row" class="heading">
-                                <th width="15%"> TxHash</th>
-                                <th width="8%"> Block</th>
-                                <th width="15%"> From</th>
-                                <th width="15%"> To</th>
-                                <th width="10%"> {{ settings.symbol }}</th>
-                                <th width="0%"> gas</th>
-                                <th width="12%"> Age</th>
-                            </tr>
+                                <tr role="row" class="heading">
+                                    <th width="15%"> TxHash</th>
+                                    <th width="8%"> Block</th>
+                                    <th width="15%"> From</th>
+                                    <th width="15%"> To</th>
+                                    <th width="10%"> {{ settings.symbol }}</th>
+                                    <th width="0%"> gas</th>
+                                    <th width="12%"> Age</th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div><!-- End: Datatable tab -->
-                    <div class="tab-pane" id="tab_addr_2" ng-show="addr.isContract"
-                         ng-class="{active: activeTab == 'tab_addr_2'}">
+                    <div class="tab-pane" id="tab_addr_2" ng-show="addr.isContract" ng-class="{active: activeTab == 'tab_addr_2'}">
                         <table class="table table-condensed" ng-show="addr.isContract">
                             <thead>
-                            <tr>
-                                <th width="15%"> TxHash</th>
-                                <th width="8%"> Block</th>
-                                <th width="15%"> From</th>
-                                <th width="15%"> To</th>
-                                <th width="10%"> {{ settings.symbol }}</th>
-                                <th width="0%"> gas</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th width="15%"> TxHash</th>
+                                    <th width="8%"> Block</th>
+                                    <th width="15%"> From</th>
+                                    <th width="15%"> To</th>
+                                    <th width="10%"> {{ settings.symbol }}</th>
+                                    <th width="0%"> gas</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="t in internal_transactions track by $index">
-                                <td class="truncate-txhash"><a
+                                <tr ng-repeat="t in internal_transactions track by $index">
+                                    <td class="truncate-txhash"><a
                                         href="/tx/{{t.transactionHash}}">{{t.transactionHash}}</a></td>
-                                <td style="text-align:right"><a href="/block/{{t.blockNumber}}">{{t.blockNumber}}</a>
-                                <td class="truncate-addrhash"><a href="/addr/{{t.from}}">{{t.from}}</a></td>
-                                <td class="truncate-addrhash"><a href="/addr/{{t.to}}">{{t.to}}</a></td>
-                                <td style="text-align:right"> {{t.value}}</td>
-                                <td style="text-align:right"> {{t.gas}}</td>
-                                <td style="text-align:center"><span class="label label-sm label-info {{t.type}}"> {{t.type}}</span><span
+                                    <td style="text-align:right"><a href="/block/{{t.blockNumber}}">{{t.blockNumber}}</a>
+                                    <td class="truncate-addrhash"><a href="/addr/{{t.from}}">{{t.from}}</a></td>
+                                    <td class="truncate-addrhash"><a href="/addr/{{t.to}}">{{t.to}}</a></td>
+                                    <td style="text-align:right"> {{t.value}}</td>
+                                    <td style="text-align:right"> {{t.gas}}</td>
+                                    <td style="text-align:center"><span class="label label-sm label-info {{t.type}}"> {{t.type}}</span><span
                                         class="label label-sm label-danger" ng-show="t.error"> {{t.error}}</span></td>
-                            </tr>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="tab-pane" id="tab_addr_3" ng-show="addr.detail.type === 'contract'"
-                         ng-class="{active: activeTab == 'tab_addr_3'}">
+                    <div class="tab-pane" id="tab_addr_3" ng-show="addr.detail.type === 'contract'" ng-class="{active: activeTab == 'tab_addr_3'}">
                         <contract-source></contract-source>
                     </div>
-                    <div class="tab-pane table-container" id="tab_addr_4"
-                         ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}">
-                        <table class="table table-striped table-hover" id="table_b"
-                               style="table-layout:fixed;width: 98% !important;">
+                    <div class="tab-pane table-container" id="tab_addr_4" ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}">
+                        <table class="table table-striped table-hover" id="table_b" style="table-layout:fixed;width: 98% !important;">
                             <thead>
-                            <tr role="row" class="heading">
-                                <th> Block </th>
-                                <th> Age </th>
-                                <th> transaction </th>
-                                <th> Difficulty </th>
-                                <th> Reward </th>
-                                <th> </th>
-                            </tr>
+                                <tr role="row" class="heading">
+                                    <th> Block </th>
+                                    <th> Age </th>
+                                    <th> transaction </th>
+                                    <th> Difficulty </th>
+                                    <th> Reward </th>
+                                    <th> </th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
                     <div class="tab-pane table-container" id="tab_addr_5">
-                        <table class="table table-striped table-hover" id="table_u"
-                               style="table-layout:fixed;width: 98% !important;">
+                        <table class="table table-striped table-hover" id="table_u" style="table-layout:fixed;width: 98% !important;">
                             <thead>
-                            <tr role="row" class="heading">
-                                <th> Block </th>
-                                <th> Age </th>
-                                <th> UncleNumber </th>
-                                <th> Difficulty </th>
-                                <th> GasUsed </th>
-                                <th> Reward </th>
-                            </tr>
+                                <tr role="row" class="heading">
+                                    <th> Block </th>
+                                    <th> Age </th>
+                                    <th> UncleNumber </th>
+                                    <th> Difficulty </th>
+                                    <th> GasUsed </th>
+                                    <th> Reward </th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
-                    <div class="tab-pane" id="tab_addr_6" ng-show="addr.detail.type === 'template'"
-                         ng-class="{active: activeTab == 'tab_addr_6'}">
+                    <div class="tab-pane" id="tab_addr_6" ng-show="addr.detail.type === 'template'" ng-class="{active: activeTab == 'tab_addr_6'}">
                         <template-source></template-source>
                     </div>
                 </div>
             </div>
-
         </div>
     </div><!-- End: portlet -->
 </div>

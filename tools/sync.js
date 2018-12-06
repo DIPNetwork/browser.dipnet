@@ -457,7 +457,7 @@ catch (error) {
 }
 // set the default NODE address to localhost if it's not provided
 if (!('nodeAddr' in config) || !(config.nodeAddr)) {
-  config.nodeAddr = '192.168.1.199'; // default
+  config.nodeAddr = 'localhost'; // default
 }
 // set the default geth port if it's not provided
 if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
@@ -474,8 +474,7 @@ if (!('bulkSize' in config) || (typeof config.bulkSize) !== 'number') {
 console.log('Connecting ' + config.nodeAddr + ':' + config.gethPort + '...');
 
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
-// var web3 = new Web3(new Web3.providers.HttpProvider('http://' + config.nodeAddr + ':' + config.gethPort.toString()));
-var web3 = new Web3(new Web3.providers.HttpProvider('http://192.168.1.199:8545'));
+var web3 = new Web3(new Web3.providers.HttpProvider('http://' + config.nodeAddr + ':' + config.gethPort.toString()));
 
 // patch missing blocks
 if (config.patch === true) {
@@ -484,7 +483,7 @@ if (config.patch === true) {
 }
 
 // Start listening for latest blocks
-// listenBlocks(config);
+listenBlocks(config);
 
 // Starts full sync when set to true in config
 if (config.syncAll === true) {

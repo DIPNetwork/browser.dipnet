@@ -29,16 +29,8 @@
       </div>
     </div>
   </div><!--end row-->
-  <div class="row" ng-show="contract.valid">
-    Contract Source Code <i class="fa fa-code"></i>
-    <pre class="code-js" ng-model="contract.sourceCode">{{contract.sourceCode}}</pre>
-    <br>
-    Contract ABI <i class="fa fa-cogs"></i>
-    <pre class="code-js" ng-model="contract.abi">{{contract.abi}}</pre><br>
-  </div>
-
   <div class="row">
-    Contract Bytecode <i class="fa fa-building-o"></i>
+    Template Bytecode <i class="fa fa-building-o"></i>
     <pre class="code-bytecode" ng-class="{verified: contract.valid}">{{contract.byteCode}}</pre>
   </div>
 </div>

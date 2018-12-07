@@ -80,20 +80,20 @@ BlocksApp.controller('HeaderController', ['$scope', '$location', 'setupObj','$st
         $scope.settings = res;
     });
     $scope.go = function (router) {
-        let tableArgs;
+        let tableArgs = {};
         switch (router){
             case 'transaction':
-                tableArgs = JSON.parse(sessionStorage.getItem('txs_table_transactions'));
+                tableArgs = JSON.parse(sessionStorage.getItem('txs_table_transactions')) || {};
                 tableArgs.start = 0;
                 sessionStorage.setItem('txs_table_transactions',JSON.stringify(tableArgs));
                 break;
             case 'blocks':
-                tableArgs = JSON.parse(sessionStorage.getItem('blocks_table_blocks'));
+                tableArgs = JSON.parse(sessionStorage.getItem('blocks_table_blocks')) || {};
                 tableArgs.start = 0;
                 sessionStorage.setItem('blocks_table_blocks',JSON.stringify(tableArgs));
                 break;
             case 'uncles':
-                tableArgs = JSON.parse(sessionStorage.getItem('uncles_table_uncles'));
+                tableArgs = JSON.parse(sessionStorage.getItem('uncles_table_uncles')) || {};
                 tableArgs.start = 0;
                 sessionStorage.setItem('uncles_table_uncles',JSON.stringify(tableArgs));
                 break;

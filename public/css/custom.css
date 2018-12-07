@@ -361,3 +361,20 @@ div .todo-tasklist-item:hover{background-color:#f3f3f3;}
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
 }
+
+.dataTables_wrapper .dataTables_paginate .paginate_button{
+  padding: 0;
+  border:none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+  border:none;
+}
+
+.pagination>li>a, .pagination>li>span{
+  float:none;
+}
+
+.table-scrollable{
+  margin-bottom: 8px!important;
+}

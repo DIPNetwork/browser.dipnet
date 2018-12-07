@@ -14,6 +14,7 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
             paging: true,
             searching: false,
             stateSave:true,
+            "pagingType": "full_numbers",
             stateSaveCallback:function(settings,data){
                 sessionStorage.setItem('txs_'+ settings.sInstance, JSON.stringify(data))
             },

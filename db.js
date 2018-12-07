@@ -12,7 +12,7 @@ var Block = new Schema(
     "transactionsRoot": String,
     "stateRoot": String,
     "receiptRoot": String,
-    "miner": String,
+    "coinbase": String,
     "difficulty": String,
     "totalDifficulty": String,
     "size": Number,

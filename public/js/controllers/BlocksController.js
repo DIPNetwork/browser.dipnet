@@ -62,7 +62,7 @@ angular.module('BlocksApp').controller('BlocksController', function ($stateParam
                 },
                 {
                     "render": function (data, type, row) {
-                        return '<a href="/addr/' + row.miner + '">' + row.miner.substr(0, 10) + '...</a>'
+                        return '<a href="/addr/' + row.coinbase + '">' + row.coinbase.substr(0, 10) + '...</a>'
                     }, "targets": [4]
                 },
                 {

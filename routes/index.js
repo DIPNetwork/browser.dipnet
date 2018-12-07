@@ -42,7 +42,7 @@ module.exports = function (app) {
     app.post('/richlist', richList);
     app.post('/addr', getAddr);
     app.post('/addr_count', getAddrCounter);
-    app.get('/tx', getTx);
+    app.post('/tx', getTx);
     app.post('/block', getBlock);
     app.post('/data', getData);
 
@@ -308,7 +308,7 @@ var getTotalSupply = function (req, res) {
 };
 
 var getTx = function (req, res) {
-    var tx = req.query;
+    var tx = req.body;
     let sql;
     if ('block' in tx) {
         sql = {'blockNumber': tx.block};

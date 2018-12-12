@@ -378,3 +378,7 @@ div .todo-tasklist-item:hover{background-color:#f3f3f3;}
 .table-scrollable{
   margin-bottom: 8px!important;
 }
+
+#table_blocks td, #table_transactions td, #table_uncles td{
+  text-indent: 8px;
+}

@@ -27,6 +27,7 @@ BlocksApp.factory('settings', ['$rootScope', '$http', function ($rootScope, $htt
         assetsPath: '/',
         globalPath: '/',
         layoutPath: '/',
+        logo:'./img/explorer-logo.png',
     };
 
     $rootScope.settings = settings;
@@ -53,7 +54,7 @@ BlocksApp.controller('MainController', ['$scope', '$rootScope', function ($scope
  By default the partials are loaded through AngularJS ng-include directive.
  ***/
 /* Setup Layout Part - Header */
-BlocksApp.controller('HeaderController', ['$scope', '$location', 'setupObj','$state', function ($scope, $location, setupObj, $state) {
+BlocksApp.controller('HeaderController', ['$scope', '$location', '$state', function ($scope, $location, setupObj, $state) {
     $scope.$on('$includeContentLoaded', function () {
         Layout.initHeader(); // init header
     });
@@ -76,9 +77,9 @@ BlocksApp.controller('HeaderController', ['$scope', '$location', 'setupObj','$st
         else
             $scope.form.searchInput = search;
     }
-    setupObj.then(function (res) {
+/*     setupObj.then(function (res) {
         $scope.settings = res;
-    });
+    }); */
     $scope.go = function (router) {
         let tableArgs = {};
         switch (router){

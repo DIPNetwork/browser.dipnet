@@ -38,8 +38,8 @@ var listenBlocks = function (config) {
           } else if (blockData == null) {
             console.log('Warning: null block data received from the block with hash/number: ' + latestBlock);
           } else {
-            writeBlockToDB(config, blockData, true);
-            writeTransactionsToDB(config, blockData, true);
+            writeBlockToDB(config, {...blockData}, true);
+            writeTransactionsToDB(config, {...blockData}, true);
           }
         });
       } else {
@@ -164,7 +164,7 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
     self.miners = [];
   }
   if (blockData) {
-    self.miners.push({address: blockData.miner, blockNumber: blockData.blockNumber, type: 0});
+    self.miners.push({address: blockData.coinbase, blockNumber: blockData.number, type: 0});
   }
   if (blockData && blockData.transactions.length > 0) {
     for (d in blockData.transactions) {

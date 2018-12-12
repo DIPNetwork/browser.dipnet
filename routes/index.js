@@ -8,6 +8,7 @@ var filters = require('./filters');
 var _ = require('lodash');
 var async = require('async');
 var BigNumber = require('bignumber.js');
+var request = require('request');
 
 var config = {};
 try {
@@ -58,6 +59,7 @@ module.exports = function (app) {
     app.get('/supply', getTotalSupply);
     app.post('/blocks', getBlocks);
     app.post('/uncles', getUncles);
+    app.post('/superNode', getSuperNode);
 }
 
 var getAddr = function (req, res) {
@@ -451,6 +453,17 @@ var getUncles = function (req, res) {
             }
         })
     });
+};
+
+var getSuperNode = async function (req, res) {
+    request({url:'http://'+config.nodeAddr+':'+config.gethPort,method:'POST', headers: {
+            "content-type": "application/json",
+        },body:JSON.stringify({"jsonrpc":"2.0","method":"dpos_getValidators","params":[],"id":10})},function (error,response,body) {
+        if(!error){
+            res.write(JSON.stringify({data:JSON.parse(body).result}));
+            res.end();
+        }
+    })
 };
 
 

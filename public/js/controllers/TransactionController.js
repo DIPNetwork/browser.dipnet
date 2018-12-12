@@ -12,6 +12,7 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
             processing: true,
             serverSide: true,
             paging: true,
+            "ordering": false,
             searching: false,
             stateSave:true,
             "pagingType": "full_numbers",

@@ -5,6 +5,7 @@ angular.module('BlocksApp').controller('BlocksController', function ($stateParam
             processing: true,
             serverSide: true,
             paging: true,
+            "ordering": false,
             searching: false,
             stateSave: true,
             "pagingType": "full_numbers",

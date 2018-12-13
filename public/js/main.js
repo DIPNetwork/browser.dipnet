@@ -27,12 +27,12 @@ BlocksApp.factory('settings', ['$rootScope', '$http', function ($rootScope, $htt
         assetsPath: '/',
         globalPath: '/',
         layoutPath: '/',
+        logo:'./img/explorer-logo.png',
     };
 
     $rootScope.settings = settings;
     return settings;
 }]);
-
 /* Load config settings */
 BlocksApp.factory('setupObj', ['$rootScope', '$http', function ($rootScope, $http) {
     return $http.get('/config').then(function (res) {
@@ -53,7 +53,7 @@ BlocksApp.controller('MainController', ['$scope', '$rootScope', function ($scope
  By default the partials are loaded through AngularJS ng-include directive.
  ***/
 /* Setup Layout Part - Header */
-BlocksApp.controller('HeaderController', ['$scope', '$location', 'setupObj','$state', function ($scope, $location, setupObj, $state) {
+BlocksApp.controller('HeaderController', ['$scope', '$location', '$state', function ($scope, $location, $state) {
     $scope.$on('$includeContentLoaded', function () {
         Layout.initHeader(); // init header
     });
@@ -76,32 +76,31 @@ BlocksApp.controller('HeaderController', ['$scope', '$location', 'setupObj','$st
         else
             $scope.form.searchInput = search;
     }
-    setupObj.then(function (res) {
+/*     setupObj.then(function (res) {
         $scope.settings = res;
-    });
+    }); */
     $scope.go = function (router) {
         let tableArgs = {};
-        switch (router){
+        switch (router) {
             case 'transaction':
                 tableArgs = JSON.parse(sessionStorage.getItem('txs_table_transactions')) || {};
                 tableArgs.start = 0;
-                sessionStorage.setItem('txs_table_transactions',JSON.stringify(tableArgs));
+                sessionStorage.setItem('txs_table_transactions', JSON.stringify(tableArgs));
                 break;
             case 'blocks':
                 tableArgs = JSON.parse(sessionStorage.getItem('blocks_table_blocks')) || {};
                 tableArgs.start = 0;
-                sessionStorage.setItem('blocks_table_blocks',JSON.stringify(tableArgs));
+                sessionStorage.setItem('blocks_table_blocks', JSON.stringify(tableArgs));
                 break;
             case 'uncles':
                 tableArgs = JSON.parse(sessionStorage.getItem('uncles_table_uncles')) || {};
                 tableArgs.start = 0;
-                sessionStorage.setItem('uncles_table_uncles',JSON.stringify(tableArgs));
+                sessionStorage.setItem('uncles_table_uncles', JSON.stringify(tableArgs));
                 break;
         }
         $state.go(router);
     }
 }]);
-/* Search Bar */
 BlocksApp.controller('PageHeadController', ['$scope', 'setupObj', function ($scope, setupObj) {
     $scope.$on('$includeContentLoaded', function () {
 
@@ -124,11 +123,11 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
     // Redirect any unmatched url
     $urlRouterProvider.otherwise("home");
     $stateProvider
-    // Dashboard
+        // Dashboard
         .state('home', {
             url: "/home",
             templateUrl: "views/home.html",
-            data: {pageTitle: 'Blockchain Explorer'},
+            data: { pageTitle: 'Blockchain Explorer' },
             controller: "HomeController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -137,7 +136,11 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
                         insertBefore: '#ng_load_plugins_before',
                         files: [
                             '/js/controllers/HomeController.js',
-                            '/css/todo-2.min.css'
+                            '/css/todo-2.min.css',
+                            '/plugins/datatables/datatables.min.css',
+                            '/plugins/datatables/datatables.bootstrap.css',
+                            '/plugins/datatables/datatables.all.min.js',
+                            '/plugins/datatables/datatable.min.js'
                         ]
                     }]);
                 }]
@@ -146,7 +149,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('address', {
             url: "/addr/{hash}",
             templateUrl: "views/address.html",
-            data: {pageTitle: 'Address'},
+            data: { pageTitle: 'Address' },
             controller: "AddressController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -167,7 +170,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('accounts', {
             url: "/accounts",
             templateUrl: "views/accounts.html",
-            data: {pageTitle: 'Accounts'},
+            data: { pageTitle: 'Accounts' },
             controller: "AccountsController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -188,7 +191,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('block', {
             url: "/block/{number}",
             templateUrl: "views/block.html",
-            data: {pageTitle: 'Block'},
+            data: { pageTitle: 'Block' },
             controller: "BlockController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -205,7 +208,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('uncle', {
             url: "/uncle/*number",
             templateUrl: "views/block.html",
-            data: {pageTitle: 'Uncle'},
+            data: { pageTitle: 'Uncle' },
             controller: "UncleController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -222,7 +225,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('tx', {
             url: "/tx/{hash}",
             templateUrl: "views/tx.html",
-            data: {pageTitle: 'Transaction'},
+            data: { pageTitle: 'Transaction' },
             controller: "TxController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -239,7 +242,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('contract', {
             url: "/contract/{addr}",
             templateUrl: "views/contract.html",
-            data: {pageTitle: 'Verify Contract'},
+            data: { pageTitle: 'Verify Contract' },
             controller: "ContractController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -257,7 +260,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('stats', {
             url: "/stats/{chart}",
             templateUrl: "views/stats/index.html",
-            data: {pageTitle: 'Statistics'},
+            data: { pageTitle: 'Statistics' },
             controller: "StatsController",
             resolve: {
                 deps: ['$ocLazyLoad', '$stateParams', function ($ocLazyLoad, $stateParams) {
@@ -277,7 +280,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('tokenlist', {
             url: "/token",
             templateUrl: "views/tokenlist.html",
-            data: {pageTitle: 'Tokens'},
+            data: { pageTitle: 'Tokens' },
             controller: "TokenListController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -294,7 +297,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('token', {
             url: "/token/{hash}",
             templateUrl: "views/token.html",
-            data: {pageTitle: 'Tokens'},
+            data: { pageTitle: 'Tokens' },
             controller: "TokenController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -311,7 +314,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('dao', {
             url: "/dao",
             templateUrl: "views/dao.html",
-            data: {pageTitle: 'theDAO'},
+            data: { pageTitle: 'theDAO' },
             controller: "DAOController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -328,7 +331,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('err404', {
             url: "/err404/{thing}/{hash}",
             templateUrl: "views/err_404.html",
-            data: {pageTitle: '404 Not Found.'},
+            data: { pageTitle: '404 Not Found.' },
             controller: "ErrController",
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {

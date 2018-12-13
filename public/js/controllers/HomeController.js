@@ -92,8 +92,8 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
               // save data
               data.count = list.data.length;
               scope.data.data = [...list.data.data];
-              scope.data.recordsTotal = list.data.length;
-              scope.data.recordsFiltered = list.data.length;
+              scope.data.recordsTotal = list.data.data.length;
+              scope.data.recordsFiltered = list.data.data.length;
               callback(scope.data);
             });
           },

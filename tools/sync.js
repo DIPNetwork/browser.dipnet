@@ -182,12 +182,12 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
         txData.templateAddress = receipt.templateAddress;
         txData.gasDeveloper = receipt.gasDeveloper;
         txData.gasMiner = receipt.gasMiner;
-        if(txData.contractAddress != null){
+        if(txData.contractAddress != null && txData.status == '0x1'){
           let contractObj = {creationTransaction:txData.hash,address:txData.contractAddress,templateAddress:txData.to,byteCode:await web3.eth.getCode(txData.contractAddress)};
             Contract.collection.insert([contractObj], function (err, contract) {
-                if (typeof err !== 'undefined' && err) {
-                    if (err.code == 11000) {
-                        if (!('quiet' in config && config.quiet === true)) {
+              if (typeof err !== 'undefined' && err) {
+                  if (err.code == 11000) {
+                      if (!('quiet' in config && config.quiet === true)) {
                             console.log('Skip: Duplicate DB key : ' + err);
                         }
                     } else {
@@ -198,23 +198,64 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
                     console.log('* ' + contract.insertedCount + ' contracts successfully written.');
                 }
             });
-        };
-        if(txData.templateAddress != null){
-          let templateObj = {address:txData.templateAddress,coinBase:'0x'+txData.input.substr(-40),byteCode:await web3.eth.getCode(txData.templateAddress)};
-          Template.collection.insert([templateObj], function (err, template) {
-              if (typeof err !== 'undefined' && err) {
-                  if (err.code == 11000) {
+            Template.findOne({'address':txData.to}).exec(function (err, doc) {
+              if(!err){
+                if(doc == null) doc = {_doc:{instance:[]}};
+                Template.collection.update({'address':txData.to},{$set:{'instance':[...doc._doc.instance,txData.contractAddress]}},{upsert:true},function (err,temp) {
+                  if (typeof err !== 'undefined' && err) {
+                    if (err.code == 11000) {
                       if (!('quiet' in config && config.quiet === true)) {
-                          console.log('Skip: Duplicate DB key : ' + err);
-                      }
-                  } else {
+                        console.log('Skip: Duplicate DB key : ' + err);
+                        }
+                    } else {
                       console.log('Error: Aborted due to error on DB: ' + err);
                       process.exit(9);
+                    }
+                  } else {
+                    console.log('* templates.instance successfully update.');
                   }
-              } else {
-                  console.log('* ' + template.insertedCount + ' templates successfully written.');
+                })
               }
+            })
+        };
+        if(txData.templateAddress != null && txData.status == '0x1'){
+            let templateObj = {address:txData.templateAddress,coinBase:'0x'+txData.input.substr(-40),byteCode:await web3.eth.getCode(txData.templateAddress)};
+            Template.findOne({address:txData.templateAddress}).exec(function (err, doc) {
+                if(!err){
+                    if(doc != null){
+                        Template.collection.update({'address':templateObj.address},{$set:{'coinbase':templateObj.coinBase,'byteCode':templateObj.byteCode}},function (err,temp) {
+                            if (typeof err !== 'undefined' && err) {
+                                if (err.code == 11000) {
+                                    if (!('quiet' in config && config.quiet === true)) {
+                                        console.log('Skip: Duplicate DB key : ' + err);
+                                    }
+                                } else {
+                                    console.log('Error: Aborted due to error on DB: ' + err);
+                                    process.exit(9);
+                                }
+                            } else {
+                                console.log('* templates.instance successfully update.');
+                            }
+                        });
+                    }else {
+                        Template.collection.insert([templateObj], function (err, template) {
+                            if (typeof err !== 'undefined' && err) {
+                                if (err.code == 11000) {
+                                    if (!('quiet' in config && config.quiet === true)) {
+                                        console.log('Skip: Duplicate DB key : ' + err);
+                                    }
+                                } else {
+                                    console.log('Error: Aborted due to error on DB: ' + err);
+                                    process.exit(9);
+                                }
+                            } else {
+                                console.log('* ' + templateObj.address + ' templates successfully written.');
+                            }
+                        });
+                    }
+                }
             });
+
         }
       }
       self.bulkOps.push(txData);
@@ -478,7 +519,7 @@ var checkBlockDBExistsThenWrite = function (config, patchData, flush) {
 var config = {};
 //Look for config.json file if not
 try {
-  var configContents = fs.readFileSync('../config.json');
+  var configContents = fs.readFileSync('config.json');
   config = JSON.parse(configContents);
   console.log('config.json found.');
 }

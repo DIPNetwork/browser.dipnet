@@ -5,6 +5,7 @@ angular.module('BlocksApp').controller('UnclesController', function ($stateParam
             processing: true,
             serverSide: true,
             paging: true,
+            "ordering": false,
             searching: false,
             stateSave:true,
             "pagingType": "full_numbers",
@@ -48,7 +49,7 @@ angular.module('BlocksApp').controller('UnclesController', function ($stateParam
                 },
                 {
                     "render": function (data, type, row) {
-                        return '<a href="/addr/' + row.miner + '">' + row.miner + '</a>'
+                        return '<a href="/addr/' + row.coinbase + '">' + row.coinbase + '</a>'
                     }, "targets": [3]
                 },
                 {

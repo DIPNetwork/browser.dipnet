@@ -2,9 +2,11 @@ var solc = require('solc');
 
 // var eth = require('./web3dummy').eth;
 var eth = require('./web3relay').eth;
+var getIsTemplate = require('./web3relay').getIsTemplate;
 
 var Contract = require('./contracts');
-
+var mongoose = require( 'mongoose' );
+var Template     = mongoose.model( 'Template' );
 /* 
   TODO: support other languages
 */
@@ -15,10 +17,20 @@ module.exports = async function(req, res) {
   if (req.body.action=="compile") {
     compileSolc(req, res);
   } else if (req.body.action=="find") {
-    // Contract.findContract(req.body.addr, res);
-      let byteCode = await eth.getCode(req.body.addr);
-      res.write(JSON.stringify({byteCode}));
-      res.end();
+      let type = JSON.parse(await getIsTemplate(req.body.addr)).result.type;
+      if(type == 'template'){
+        Template.findOne({'address':req.body.addr}).exec(function (err,doc) {
+            res.write(JSON.stringify(doc._doc));
+            res.end();
+        })
+      }
+      if(type == 'contract'){
+          Contract.findContract(req.body.addr,res);
+      }
+      if(type == 'normal'){
+          res.write(JSON.stringify({}));
+          res.end();
+      }
   }
 
 }

@@ -2,16 +2,17 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
     $scope.data = {};
     $scope.queryInfo = {};
     if('addr' in  $location.search()){
-        $scope.queryInfo.addr = $scope.queryInfo.addr;
+        $scope.queryInfo.addr = $location.search().addr;
     }
     if('block' in  $location.search()){
-        $scope.queryInfo.addr = $scope.queryInfo.block;
+        $scope.queryInfo.block = $location.search().block;
     }
     var fetchUncles = function () {
         var table = $("#table_transactions").DataTable({
             processing: true,
             serverSide: true,
             paging: true,
+            "ordering": false,
             searching: false,
             stateSave:true,
             "pagingType": "full_numbers",
@@ -22,11 +23,7 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
                 return JSON.parse(sessionStorage.getItem('txs_'+settings.sInstance));
             },
             ajax: function (data, callback, settings) {
-                let sql = '';
-                if ('addr' in $scope.queryInfo || 'block' in $scope.queryInfo) {
-                    sql = '&' + Object.keys($scope.queryInfo)[0] + '=' + Object.values($scope.queryInfo)[0];
-                }
-                $http.post('/tx',{page:Math.ceil(data.start / data.length) + 1,size:data.length,...sql}).then(function (list) {
+                $http.post('/tx',{page:Math.ceil(data.start / data.length) + 1,size:data.length,...$scope.queryInfo}).then(function (list) {
                     // save data
                     data.count = list.data.length;
                     $scope.data.data = [...list.data.data];

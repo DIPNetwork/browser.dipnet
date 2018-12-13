@@ -1,4 +1,4 @@
-<div class="col-md-12">
+<!-- <div class="col-md-12">
   <div class="row" style="margin-bottom:20px;" ng-show="!contract.valid">
     <span class="eth-stat" >
     <i style="color: red" class="fa fa-wheelchair"></i> Contract Source Code Unverified
@@ -6,31 +6,53 @@
     <span class="eth-stat-text"><a href="/contract/{{addrHash}}">Verify And Publish Source Code.</a></span>
   </div>
 
-  <div class="row" ng-show="contract.valid">
+  <div class="row" ng-show="template.valid">
     <p class="eth-stat">
     <i style="color: green" class="fa fa-check-circle-o"></i> Contract Source Code Verified
     </p>
   </div>
-  <div class="row" ng-show="contract.valid">
+  <div class="row" ng-show="template.valid">
     <div class="col-md-6 center">
       <div class="eth-stat">
           <div class="margin-top-20">
           <span class="eth-stat-text">Contract Name: </span>
-          <span ng-model="contract.contractName">{{contract.contractName}}</span>
+          <span ng-model="template.contractName">{{template.contractName}}</span>
           </div>
           <div class="margin-top-20">
           <span class="eth-stat-text">Compiler Version: </span>
-          <span ng-model="contract.compilerVersion">{{contract.compilerVersion}}</span>
+          <span ng-model="template.compilerVersion">{{template.compilerVersion}}</span>
           </div>
           <div class="margin-top-20">
           <span class="eth-stat-text">Optimization Enabled: </span>
-          <span ng-model="contract.optimization">{{contract.optimization}}</span>
+          <span ng-model="template.optimization">{{template.optimization}}</span>
           </div>
       </div>
     </div>
-  </div><!--end row-->
+  </div> -->
   <div class="row">
     Template Bytecode <i class="fa fa-building-o"></i>
-    <pre class="code-bytecode" ng-class="{verified: contract.valid}">{{contract.byteCode}}</pre>
+    <pre class="code-bytecode" ng-class="{verified: template.valid}">{{template.byteCode}}</pre>
+  </div>
+  <div class="row">
+    <div class="portlet light portlet-datatable col-md-12">
+      <div class="portlet-body">
+        <div class="tabbable-line">
+          <div class="tab-content">
+            <div class="tab-pane table-container" ng-class="{active: true}" id="tab_block_1">
+              <!-- Datatable tab -->
+              <table class="table table-striped table-hover" id="table_TemplateInstance" style="table-layout:fixed;width: 98% !important;">
+                <thead>
+                  <tr role="row" class="heading">
+                    <th>Template Instance</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div><!-- End: Datatable tab -->
+          </div>
+        </div>
+
+      </div>
+    </div><!-- End: portlet -->
   </div>
 </div>

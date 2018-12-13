@@ -63,6 +63,64 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
       }
   }
 })
+.directive('superNodes', function ($http) {
+  return {
+    restrict: 'E',
+    templateUrl: '/views/super-nodes.html',
+    scope: true,
+    link: function (scope, elem, attrs) {
+
+      scope.data = {};
+      (function () {
+        var table = $("#table_superNodes").DataTable({
+          processing: true,
+          serverSide: true,
+          paging: false,
+          "ordering": false,
+          searching: false,
+          stateSave: true,
+          "pagingType": "full_numbers",
+          stateSaveCallback: function (settings, data) {
+            sessionStorage.setItem('superNodes_' + settings.sInstance, JSON.stringify(data))
+          },
+          stateLoadCallback: function (settings) {
+            return JSON.parse(sessionStorage.getItem('superNodes_' + settings.sInstance));
+          },
+          ajax: function (data, callback, settings) {
+
+            $http.post("/superNode").then(function (list) {
+              // save data
+              data.count = list.data.length;
+              scope.data.data = [...list.data.data];
+              scope.data.recordsTotal = list.data.data.length;
+              scope.data.recordsFiltered = list.data.data.length;
+              callback(scope.data);
+            });
+          },
+          "lengthMenu": [
+            [10, 20, 50, 100],
+            [10, 20, 50, 100] // change per page values here
+          ],
+          "pageLength": 10,
+          "language": {
+            "lengthMenu": "",
+            "zeroRecords": "",
+            "infoEmpty": "",
+            "infoFiltered": ""
+          },
+          "columnDefs": [
+            { "orderable": false, "targets": [0] },
+            {
+              "render": function (data, type, row) {
+                return '<a href="/addr/' + row + '">' + row + '</a>'
+              }, "targets": [0]
+            },
+          ]
+        });
+      }());
+    }
+  }
+})
 .directive('siteNotes', function() {
   return {
     restrict: 'E',

@@ -268,27 +268,85 @@ angular.module('BlocksApp').controller('AddressController', function ($statePara
         });
     }
                     //从自定义指令提出了http请求
-    $http({
-        method: 'POST',
-        url: '/compile',
-        data: {"addr": $scope.addrHash, "action": "find"}
-    }).then(function (resp) {
-        console.log(resp.data);
-        $scope.contract = resp.data;
-    });
+
 
 })
     .directive('contractSource', function ($http) {
         return {
             restrict: 'E',
             templateUrl: '/views/contract-source.html',
-            scope: false,
+            scope: true,
+            link: function ($scope, elem, attrs) {
+                $http({
+                    method: 'POST',
+                    url: '/compile',
+                    data: {
+                        "addr": $scope.addrHash,
+                        "action": "find"
+                    }
+                }).then(function (resp) {
+                    console.log(resp.data);
+                    $scope.contract = resp.data;
+                });
+            }         
         }
     })
     .directive('templateSource', function ($http) {
         return {
             restrict: 'E',
             templateUrl: '/views/template-source.html',
-            scope: false,
+            scope: true,
+            link: function ($scope, elem, attrs) {
+                $scope.template = {};
+                (function () {
+                    var table = $("#table_TemplateInstance").DataTable({
+                        processing: true,
+                        serverSide: true,
+                        paging: false,
+                        "ordering": false,
+                        searching: false,
+                        stateSave: true,
+                        "pagingType": "full_numbers",
+                        ajax: function (data, callback, settings) {
+                            $http({
+                                   method: 'POST',
+                                   url: '/compile',
+                                   data: {
+                                       "addr": $scope.addrHash,
+                                       "action": "find"
+                                   }
+                               }).then(function (list) {   
+                                $scope.template = list.data;
+                                $scope.template.data = [...list.data.instance];
+                                $scope.template.recordsTotal = list.data.instance.length;
+                                $scope.template.recordsFiltered = list.data.instance.length;
+                                callback($scope.template);
+                            });
+                        },
+                        "lengthMenu": [
+                            [10, 20, 50, 100],
+                            [10, 20, 50, 100] // change per page values here
+                        ],
+                        "pageLength": 10,
+                        "language": {
+                            "lengthMenu": "",
+                            "zeroRecords": "",
+                            "infoEmpty": "",
+                            "infoFiltered": ""
+                        },
+                        "columnDefs": [{
+                                "orderable": false,
+                                "targets": [0]
+                            },
+                            {
+                                "render": function (data, type, row) {
+                                    return '<a href="/addr/' + row + '">' + row + '</a>'
+                                },
+                                "targets": [0]
+                            },
+                        ]
+                    });
+                }());
+            }
         }
     })

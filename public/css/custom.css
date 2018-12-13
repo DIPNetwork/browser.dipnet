@@ -382,3 +382,16 @@ div .todo-tasklist-item:hover{background-color:#f3f3f3;}
 #table_blocks td, #table_transactions td, #table_uncles td{
   text-indent: 8px;
 }
+
+super-nodes .tabbable-line>.tab-content, template-source .tabbable-line>.tab-content{
+    border-top:0px;
+}
+
+template-source .tabbable-line>.tab-content {
+    padding-top: 10px;
+}
+
+
+template-source .row > .portlet{
+    padding: 0;
+}

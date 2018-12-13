@@ -128,7 +128,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="tab-pane" id="tab_addr_3" ng-show="addr.detail.type === 'contract'" ng-class="{active: activeTab == 'tab_addr_3'}">
+                    <div class="tab-pane" id="tab_addr_3" ng-if="addr.detail.type === 'contract'" ng-class="{active: activeTab == 'tab_addr_3'}">
                         <contract-source></contract-source>
                     </div>
                     <div class="tab-pane table-container" id="tab_addr_4" ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}">
@@ -161,7 +161,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
-                    <div class="tab-pane" id="tab_addr_6" ng-show="addr.detail.type === 'template'" ng-class="{active: activeTab == 'tab_addr_6'}">
+                    <div class="tab-pane" id="tab_addr_6" ng-if="addr.detail.type === 'template'" ng-class="{active: activeTab == 'tab_addr_6'}">
                         <template-source></template-source>
                     </div>
                 </div>

@@ -324,3 +324,4 @@ function getIsTemplate(addr){
 }
 
 exports.eth = web3.eth;
+exports.getIsTemplate = getIsTemplate;

@@ -17,10 +17,16 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
             stateSave:true,
             "pagingType": "full_numbers",
             stateSaveCallback:function(settings,data){
+                if ($scope.queryInfo.block) data.currentBlock = $scope.queryInfo.block
                 sessionStorage.setItem('txs_'+ settings.sInstance, JSON.stringify(data))
             },
             stateLoadCallback:function(settings){
-                return JSON.parse(sessionStorage.getItem('txs_'+settings.sInstance));
+                let LoadDatas = JSON.parse(sessionStorage.getItem('txs_'+settings.sInstance));
+                if (LoadDatas && LoadDatas.currentBlock !== $scope.queryInfo.block) {
+                    LoadDatas.start = 0
+                    LoadDatas.length = 10 
+                } 
+                return LoadDatas
             },
             ajax: function (data, callback, settings) {
                 $http.post('/tx',{page:Math.ceil(data.start / data.length) + 1,size:data.length,...$scope.queryInfo}).then(function (list) {

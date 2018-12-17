@@ -68,7 +68,7 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
                 {
                     "render": function (data, type, row) {
                         if(row.to == null){
-                            row.to = row.contractAddress;
+                            row.to = row.templateAddress;
                         }
                         return '<a href="/addr/' + row.to + '" title="' + row.to + '">' + row.to.substr(0, 10) + '...</a>'
                     }, "targets": [4]

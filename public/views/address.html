@@ -34,7 +34,8 @@
                             <a href="/addr/{{addr.detail.temAddress}}">{{ addr.detail.temAddress }}</a>
                         </div>
                         <div class="margin-top-20" ng-show="addr.detail.type === 'template'&& addr.detail.coinbase"">
-                            <span class="eth-stat-text">Author</span> {{ addr.coinbase }}
+                            <span class="eth-stat-text">Author</span> 
+                            <a href="/addr/{{addr.detail.coinbase}}"> {{ addr.detail.coinbase }}</a>
                         </div>           
                     </div>
                 </div>

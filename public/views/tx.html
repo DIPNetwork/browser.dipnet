@@ -64,15 +64,19 @@
                     <td width="25%">nonce & potion</td>
                     <td>{{tx.nonce}} | { {{tx.transactionIndex}} }</td>
                 </tr>
+                <tr ng-show="tx.templateAddress">
+                    <td width="25%">Template Address</td>
+                    <td><a href="/addr/{{tx.templateAddress}}"> {{tx.templateAddress }}</a></td>
+                </tr>
+                <tr ng-show="tx.contractAddress">
+                    <td width="25%">Template Address</td>
+                    <td><a href="/addr/{{tx.contractAddress}}"> {{tx.contractAddress }}</a></td>
+                </tr>
                 <tr>
                     <td width="25%">Input Data</td>
                     <td>
                         <pre class="code">{{tx.input}}</pre>
                     </td>
-                </tr>
-                <tr>
-                    <td width="25%">Template Address</td>
-                    <td>{{tx.templateAddress ? tx.templateAddress : '0x0'}}</td>
                 </tr>
             </table>
 

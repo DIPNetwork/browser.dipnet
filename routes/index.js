@@ -114,7 +114,7 @@ var getAddrCounter = function (req, res) {
 
         }, function (callback) {
 
-            Block.count({"miner": addr}, function (err, count) {
+            Block.count({"coinbase": addr}, function (err, count) {
                 if (!err && count) {
                     data.mined = count;
                 }
@@ -371,7 +371,7 @@ var latestBlock = function (req, res) {
 
 
 var getLatest = function (lim, res, callback) {
-    var blockFind = Block.find({}, "number transactions timestamp miner extraData")
+    var blockFind = Block.find({}, "number transactions timestamp coinbase extraData")
         .lean(true).sort('-number').limit(lim);
     blockFind.exec(function (err, docs) {
         callback(docs, res);
@@ -380,7 +380,7 @@ var getLatest = function (lim, res, callback) {
 
 /* get blocks from db */
 var sendBlocks = function (lim, res) {
-    var blockFind = Block.find({}, "number timestamp miner extraData")
+    var blockFind = Block.find({}, "number timestamp coinbase extraData")
         .lean(true).sort('-number').limit(lim);
     blockFind.exec(function (err, docs) {
         if (!err && docs) {
@@ -422,7 +422,7 @@ var sendTxs = function (lim, res) {
 var getBlocks = function (req, res) {
     let sql = {};
     if ('addr' in req.body) {
-        sql.miner = req.body.addr;
+        sql.coinbase = req.body.addr;
     }
     Block.find(sql).count().exec(function (err, num) {
         Block.find(sql).lean(true).sort({number: -1}).limit(req.body.size).skip((req.body.page - 1) * req.body.size).exec(function (err, list) {
@@ -440,7 +440,7 @@ var getBlocks = function (req, res) {
 var getUncles = function (req, res) {
     let sql = {};
     if ('addr' in req.body) {
-        sql.miner = req.body.addr;
+        sql.coinbase = req.body.addr;
     }
     Uncle.find(sql).count().exec(function (err, num) {
         Uncle.find(sql).lean(true).sort({number: -1}).limit(req.body.size).skip((req.body.page - 1) * req.body.size).exec(function (err, list) {

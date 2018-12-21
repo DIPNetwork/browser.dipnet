@@ -26,12 +26,12 @@
                     <td width="25%">From</td>
                     <td><a href="/addr/{{tx.from}}">{{tx.from}}</a></td>
                 </tr>
-                <tr ng-show="tx.to">
+                <tr ng-show="tx.to || tx.templateAddress">
                     <td width="25%">To</td>
                     <td>
                         <span ng-show="isCall || isCreate"><span ng-show="tx.contractAddress">[</span>Contract </span>
-                        <a href="/addr/{{tx.to}}">{{tx.to}}</a>
-                        <span ng-show="tx.contractAddress"> Created] </span><i class="fa fa-check-circle-o green" ng-show="isCall || isCreate"></i></td>
+                        <a href="/addr/{{tx.to ? tx.to : tx.templateAddress}}">{{tx.to ? tx.to : tx.templateAddress}}</a>
+                        <span ng-show="tx.templateAddress || tx.contractAddress"> [Created {{tx.templateAddress ? 'Template' : 'Contract'}}] </span><i class="fa fa-check-circle-o green" ng-show="isCall || isCreate"></i></td>
                 </tr>
                 <tr>
                     <td width="25%">Value</td>
@@ -64,15 +64,19 @@
                     <td width="25%">nonce & potion</td>
                     <td>{{tx.nonce}} | { {{tx.transactionIndex}} }</td>
                 </tr>
+                <tr ng-show="tx.templateAddress">
+                    <td width="25%">Template Address</td>
+                    <td><a href="/addr/{{tx.templateAddress}}"> {{tx.templateAddress }}</a></td>
+                </tr>
+                <tr ng-show="tx.contractAddress">
+                    <td width="25%">Contract Address</td>
+                    <td><a href="/addr/{{tx.contractAddress}}"> {{tx.contractAddress }}</a></td>
+                </tr>
                 <tr>
                     <td width="25%">Input Data</td>
                     <td>
                         <pre class="code">{{tx.input}}</pre>
                     </td>
-                </tr>
-                <tr>
-                    <td width="25%">Template Address</td>
-                    <td>{{tx.templateAddress ? tx.templateAddress : '0x0'}}</td>
                 </tr>
             </table>
 

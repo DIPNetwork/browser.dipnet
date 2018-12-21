@@ -19,6 +19,8 @@ angular.module('BlocksApp').controller('AddressController', function ($statePara
         url: '/web3relay',
         data: {"addr": $scope.addrHash, "options": ["balance", "count", "bytecode"]}
     }).then(function (resp) {
+        resp.data.detail.coinbase = resp.data.detail.coinbase.toLowerCase();
+        resp.data.detail.temAddress = resp.data.detail.temAddress.toLowerCase();
         $scope.addr = $.extend($scope.addr, resp.data);
         fetchTxs();
         fetchBlocks();
@@ -180,7 +182,7 @@ angular.module('BlocksApp').controller('AddressController', function ($statePara
                 },
                 {
                     "render": function (data, type, row) {
-                        return '<a href="/addr/' + row.miner + '">' + row.miner.substr(0, 10) + '...</a>'
+                        return '<a href="/addr/' + row.coinbase + '">' + row.coinbase.substr(0, 10) + '...</a>'
                     }, "targets": [4]
                 },
                 {

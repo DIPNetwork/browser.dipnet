@@ -29,11 +29,11 @@
                         <div class="margin-top-20">
                             <span class="eth-stat-text">Uncles</span> {{ addr.uncles }}
                         </div>
-                        <div class="margin-top-20" ng-show="addr.detail.type === 'template' && addr.detail.temAddress">
+                        <div class="margin-top-20" ng-show="addr.detail.type === 'contract' && addr.detail.temAddress">
                             <span class="eth-stat-text">Template</span> 
                             <a href="/addr/{{addr.detail.temAddress}}">{{ addr.detail.temAddress }}</a>
                         </div>
-                        <div class="margin-top-20" ng-show="addr.detail.type === 'template'&& addr.detail.coinbase"">
+                        <div class="margin-top-20" ng-show="addr.detail.type === 'template'&& addr.detail.coinbase">
                             <span class="eth-stat-text">Author</span> 
                             <a href="/addr/{{addr.detail.coinbase}}"> {{ addr.detail.coinbase }}</a>
                         </div>           

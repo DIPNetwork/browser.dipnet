@@ -38,13 +38,13 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
     $scope.timer = $interval(function () {
         $scope.reloadBlocks();
         $scope.reloadTransactions();
-    },5000);
+    },3000);
 
     $scope.$on('$destroy',function () {
         $interval.cancel($scope.timer);
     });
 })
-.directive('simpleSummaryStats', function($http) {
+.directive('simpleSummaryStats', function($http,$interval) {
   return {
     restrict: 'E',
     templateUrl: '/views/simple-summary-stats.html',
@@ -52,14 +52,22 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
     link: function(scope, elem, attrs){
       scope.stats = {};
       var statsURL = "/web3relay";
-      $http.post(statsURL, {"action": "hashrate"})
-       .then(function(res){
-          scope.stats.hashrate = res.data.hashrate;
-          scope.stats.difficulty = res.data.difficulty;
-          scope.stats.blockHeight = res.data.blockHeight;
-          scope.stats.blockTime = res.data.blockTime;
-          //console.log(res);
-        });
+      scope.reloadInfo = function () {
+          $http.post(statsURL, {"action": "hashrate"})
+              .then(function(res){
+                  scope.stats.hashrate = res.data.hashrate;
+                  scope.stats.difficulty = res.data.difficulty;
+                  scope.stats.blockHeight = res.data.blockHeight;
+                  scope.stats.blockTime = res.data.blockTime;
+              });
+      }
+      scope.reloadInfo();
+      scope.infoTimer = $interval(function () {
+          scope.reloadInfo();
+      },3000);
+      scope.$on('$destroy',function () {
+          $interval.cancel(scope.infoTimer);
+      })
       }
   }
 })

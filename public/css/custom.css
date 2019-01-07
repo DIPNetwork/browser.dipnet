@@ -395,3 +395,10 @@ template-source .tabbable-line>.tab-content {
 template-source .row > .portlet{
     padding: 0;
 }
+
+
+@media screen and (max-width: 767px) {
+  .dataTables_info{
+    margin-bottom: 8px!important;
+  }
+}

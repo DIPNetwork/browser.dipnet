@@ -5,7 +5,6 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
         } else {
             $scope.activeTab = 'tab_addr_1'
         }
-
         $rootScope.$state.current.data["pageSubTitle"] = $stateParams.hash;
         $scope.addrHash = $stateParams.hash;
         $scope.addr = {

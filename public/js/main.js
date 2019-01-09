@@ -6,16 +6,17 @@ var BlocksApp = angular.module("BlocksApp", [
 ]);
 BlocksApp.constant('_', window._); // loadsh
 BlocksApp.config(['$ocLazyLoadProvider', '$locationProvider',
-    function ($ocLazyLoadProvider, $locationProvider) {
+    function($ocLazyLoadProvider, $locationProvider) {
         $ocLazyLoadProvider.config({
             cssFilesInsertBefore: 'ng_load_plugins_before' // load the above css files before a LINK element with this ID. Dynamic CSS files must be loaded between core and theme css files
         });
         $locationProvider.html5Mode({
             enabled: true
         });
-    }]);
+    }
+]);
 /* Setup global settings */
-BlocksApp.factory('settings', ['$rootScope', '$http', function ($rootScope, $http) {
+BlocksApp.factory('settings', ['$rootScope', '$http', function($rootScope, $http) {
     // supported languages
     var settings = {
         layout: {
@@ -27,22 +28,22 @@ BlocksApp.factory('settings', ['$rootScope', '$http', function ($rootScope, $htt
         assetsPath: '/',
         globalPath: '/',
         layoutPath: '/',
-        logo:'./img/explorer-logo.png',
+        logo: './img/explorer-logo.png',
     };
 
     $rootScope.settings = settings;
     return settings;
 }]);
 /* Load config settings */
-BlocksApp.factory('setupObj', ['$rootScope', '$http', function ($rootScope, $http) {
-    return $http.get('/config').then(function (res) {
+BlocksApp.factory('setupObj', ['$rootScope', '$http', function($rootScope, $http) {
+    return $http.get('/config').then(function(res) {
         return res.data;
     })
 }]);
 
 /* Setup App Main Controller */
-BlocksApp.controller('MainController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-    $scope.$on('$viewContentLoaded', function () {
+BlocksApp.controller('MainController', ['$scope', '$rootScope', function($scope, $rootScope) {
+    $scope.$on('$viewContentLoaded', function() {
         //App.initComponents(); // init core components
         //Layout.init(); //  Init entire layout(header, footer, sidebar, etc) on page load if the partials included in server side instead of loading with ng-include directive
     });
@@ -53,13 +54,13 @@ BlocksApp.controller('MainController', ['$scope', '$rootScope', function ($scope
  By default the partials are loaded through AngularJS ng-include directive.
  ***/
 /* Setup Layout Part - Header */
-BlocksApp.controller('HeaderController', ['$scope', '$location', '$state', function ($scope, $location, $state) {
-    $scope.$on('$includeContentLoaded', function () {
+BlocksApp.controller('HeaderController', ['$scope', '$location', '$state', function($scope, $location, $state) {
+    $scope.$on('$includeContentLoaded', function() {
         Layout.initHeader(); // init header
     });
     $scope.form = {};
-    $scope.searchQuery = function (s) {
-        if(!s){
+    $scope.searchQuery = function(s) {
+        if (!s) {
             return;
         }
         var search = s.toLowerCase();
@@ -76,10 +77,10 @@ BlocksApp.controller('HeaderController', ['$scope', '$location', '$state', funct
         else
             $scope.form.searchInput = search;
     }
-/*     setupObj.then(function (res) {
-        $scope.settings = res;
-    }); */
-    $scope.go = function (router) {
+    /*     setupObj.then(function (res) {
+            $scope.settings = res;
+        }); */
+    $scope.go = function(router) {
         let tableArgs = {};
         switch (router) {
             case 'transaction':
@@ -101,25 +102,25 @@ BlocksApp.controller('HeaderController', ['$scope', '$location', '$state', funct
         $state.go(router);
     }
 }]);
-BlocksApp.controller('PageHeadController', ['$scope', 'setupObj', function ($scope, setupObj) {
-    $scope.$on('$includeContentLoaded', function () {
+BlocksApp.controller('PageHeadController', ['$scope', 'setupObj', function($scope, setupObj) {
+    $scope.$on('$includeContentLoaded', function() {
 
     });
-    setupObj.then(function (res) {
+    setupObj.then(function(res) {
         $scope.settings = res;
     });
 }]);
 /* Setup Layout Part - Footer */
-BlocksApp.controller('FooterController', ['$scope', 'setupObj', function ($scope, setupObj) {
-    $scope.$on('$includeContentLoaded', function () {
+BlocksApp.controller('FooterController', ['$scope', 'setupObj', function($scope, setupObj) {
+    $scope.$on('$includeContentLoaded', function() {
         Layout.initFooter(); // init footer
     });
-    setupObj.then(function (res) {
+    setupObj.then(function(res) {
         $scope.settings = res;
     });
 }]);
 /* Setup Rounting For All Pages */
-BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
+BlocksApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
     // Redirect any unmatched url
     $urlRouterProvider.otherwise("home");
     $stateProvider
@@ -127,10 +128,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('home', {
             url: "/home",
             templateUrl: "views/home.html",
-            data: { pageTitle: 'Blockchain Explorer' },
+            data: {
+                pageTitle: 'Blockchain Explorer'
+            },
             controller: "HomeController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load([{
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -149,10 +152,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('address', {
             url: "/addr/{hash}",
             templateUrl: "views/address.html",
-            data: { pageTitle: 'Address' },
+            data: {
+                pageTitle: 'Address'
+            },
             controller: "AddressController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
@@ -170,10 +175,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('accounts', {
             url: "/accounts",
             templateUrl: "views/accounts.html",
-            data: { pageTitle: 'Accounts' },
+            data: {
+                pageTitle: 'Accounts'
+            },
             controller: "AccountsController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
@@ -191,10 +198,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('block', {
             url: "/block/{number}",
             templateUrl: "views/block.html",
-            data: { pageTitle: 'Block' },
+            data: {
+                pageTitle: 'Block'
+            },
             controller: "BlockController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
@@ -208,10 +217,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('uncle', {
             url: "/uncle/*number",
             templateUrl: "views/block.html",
-            data: { pageTitle: 'Uncle' },
+            data: {
+                pageTitle: 'Uncle'
+            },
             controller: "UncleController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
@@ -225,10 +236,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('tx', {
             url: "/tx/{hash}",
             templateUrl: "views/tx.html",
-            data: { pageTitle: 'Transaction' },
+            data: {
+                pageTitle: 'Transaction'
+            },
             controller: "TxController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
@@ -242,10 +255,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('contract', {
             url: "/contract/{addr}",
             templateUrl: "views/contract.html",
-            data: { pageTitle: 'Verify Contract' },
+            data: {
+                pageTitle: 'Verify Contract'
+            },
             controller: "ContractController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -260,10 +275,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('stats', {
             url: "/stats/{chart}",
             templateUrl: "views/stats/index.html",
-            data: { pageTitle: 'Statistics' },
+            data: {
+                pageTitle: 'Statistics'
+            },
             controller: "StatsController",
             resolve: {
-                deps: ['$ocLazyLoad', '$stateParams', function ($ocLazyLoad, $stateParams) {
+                deps: ['$ocLazyLoad', '$stateParams', function($ocLazyLoad, $stateParams) {
                     return $ocLazyLoad.load({
                         insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
                         files: [
@@ -280,10 +297,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('tokenlist', {
             url: "/token",
             templateUrl: "views/tokenlist.html",
-            data: { pageTitle: 'Tokens' },
+            data: {
+                pageTitle: 'Tokens'
+            },
             controller: "TokenListController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -297,10 +316,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('token', {
             url: "/token/{hash}",
             templateUrl: "views/token.html",
-            data: { pageTitle: 'Tokens' },
+            data: {
+                pageTitle: 'Tokens'
+            },
             controller: "TokenController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -314,10 +335,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('dao', {
             url: "/dao",
             templateUrl: "views/dao.html",
-            data: { pageTitle: 'theDAO' },
+            data: {
+                pageTitle: 'theDAO'
+            },
             controller: "DAOController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -331,10 +354,12 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
         .state('err404', {
             url: "/err404/{thing}/{hash}",
             templateUrl: "views/err_404.html",
-            data: { pageTitle: '404 Not Found.' },
+            data: {
+                pageTitle: '404 Not Found.'
+            },
             controller: "ErrController",
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -350,7 +375,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
             templateUrl: "views/block_chain/transaction.html",
             controller: 'TransactionController',
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -370,7 +395,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
             templateUrl: "views/block_chain/block.html",
             controller: 'BlocksController',
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -390,7 +415,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
             templateUrl: "views/block_chain/uncle.html",
             controller: 'UnclesController',
             resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'BlocksApp',
                         insertBefore: '#ng_load_plugins_before',
@@ -406,27 +431,30 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function ($stateProvid
             }
         })
 }]);
-BlocksApp.filter('timeDuration', function () {
-    return function (timestamp) {
-        return getDuration(timestamp).toString();
-    };
-})
-    .filter('totalDifficulty', function () {
-        return function (hashes) {
+BlocksApp.filter('timeDuration', function() {
+        return function(timestamp) {
+            return getDuration(timestamp).toString();
+        };
+    })
+    .filter('totalDifficulty', function() {
+        return function(hashes) {
             return getDifficulty(hashes);
         };
     })
-    .filter('teraHashes', function () {
-        return function (hashes) {
+    .filter('teraHashes', function() {
+        return function(hashes) {
             var result = hashes / Math.pow(1000, 4);
             return parseInt(result);
         }
     })
 /* Init global settings and run the app */
-BlocksApp.run(["$rootScope", "settings", "$state", "setupObj", function ($rootScope, settings, $state, setupObj) {
+BlocksApp.run(["$rootScope", "settings", "$state", "setupObj", function($rootScope, settings, $state, setupObj) {
+    $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState) {
+        $rootScope.isHome = toState.url.indexOf('home') > -1
+    })
     $rootScope.$state = $state; // state to be accessed from view
     $rootScope.$settings = settings; // state to be accessed from view
-    setupObj.then(function (res) {
+    setupObj.then(function(res) {
         $rootScope.setup = res;
     });
 }]);

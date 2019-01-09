@@ -1,35 +1,40 @@
-angular.module('BlocksApp').controller('TransactionController', function ($stateParams, $rootScope, $scope, $http, $location) {
+angular.module('BlocksApp').controller('TransactionController', function($stateParams, $rootScope, $scope, $http, $location) {
     $scope.data = {};
     $scope.queryInfo = {};
-    if('addr' in  $location.search()){
+    if ('addr' in $location.search()) {
         $scope.queryInfo.addr = $location.search().addr;
     }
-    if('block' in  $location.search()){
+    if ('block' in $location.search()) {
         $scope.queryInfo.block = $location.search().block;
     }
-    var fetchUncles = function () {
+    var fetchUncles = function() {
         var table = $("#table_transactions").DataTable({
             processing: true,
             serverSide: true,
             paging: true,
             "ordering": false,
             searching: false,
-            stateSave:true,
-            "pagingType": "full_numbers",
-            stateSaveCallback:function(settings,data){
+            "scrollX": true,
+            stateSave: true,
+            "pagingType": $("html")[0].offsetWidth > 550 ? "full_numbers" : "full",
+            stateSaveCallback: function(settings, data) {
                 if ($scope.queryInfo.block) data.currentBlock = $scope.queryInfo.block
-                sessionStorage.setItem('txs_'+ settings.sInstance, JSON.stringify(data))
+                sessionStorage.setItem('txs_' + settings.sInstance, JSON.stringify(data))
             },
-            stateLoadCallback:function(settings){
-                let LoadDatas = JSON.parse(sessionStorage.getItem('txs_'+settings.sInstance));
+            stateLoadCallback: function(settings) {
+                let LoadDatas = JSON.parse(sessionStorage.getItem('txs_' + settings.sInstance));
                 if (LoadDatas && LoadDatas.currentBlock !== $scope.queryInfo.block) {
                     LoadDatas.start = 0
-                    LoadDatas.length = 10 
-                } 
+                    LoadDatas.length = 10
+                }
                 return LoadDatas
             },
-            ajax: function (data, callback, settings) {
-                $http.post('/tx',{page:Math.ceil(data.start / data.length) + 1,size:data.length,...$scope.queryInfo}).then(function (list) {
+            ajax: function(data, callback, settings) {
+                $http.post('/tx', {
+                    page: Math.ceil(data.start / data.length) + 1,
+                    size: data.length,
+                    ...$scope.queryInfo
+                }).then(function(list) {
                     // save data
                     data.count = list.data.length;
                     $scope.data.data = [...list.data.data];
@@ -49,47 +54,48 @@ angular.module('BlocksApp').controller('TransactionController', function ($state
                 "infoEmpty": ":(",
                 "infoFiltered": "(filtered from _MAX_ total txs)"
             },
-            "columnDefs": [
-                {"orderable": false, "targets": [0, 1, 2, 3, 4, 5, 6]},
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/tx/' + row.hash + '">' + row.hash.substr(0, 10) + '...</a>'
-                    }, "targets": [0]
+            "columnDefs": [{
+                "orderable": false,
+                "targets": [0, 1, 2, 3, 4, 5, 6]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/tx/' + row.hash + '">' + row.hash.substr(0, 10) + '...</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return getDuration(row.timestamp).toString();
-                    }, "targets": [2]
+                "targets": [0]
+            }, {
+                "render": function(data, type, row) {
+                    return getDuration(row.timestamp).toString();
                 },
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/block/' + row.blockNumber + '">' + row.blockNumber + '</a>'
-                    }, "targets": [1]
+                "targets": [2]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/block/' + row.blockNumber + '">' + row.blockNumber + '</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/addr/' + row.from + '">' + row.from.substr(0, 10) + '...</a>';
-                    }, "targets": [3]
+                "targets": [1]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/addr/' + row.from + '">' + row.from.substr(0, 10) + '...</a>';
                 },
-                {
-                    "render": function (data, type, row) {
-                        if(row.to == null){
-                            row.to = row.templateAddress;
-                        }
-                        return '<a href="/addr/' + row.to + '" title="' + row.to + '">' + row.to.substr(0, 10) + '...</a>'
-                    }, "targets": [4]
+                "targets": [3]
+            }, {
+                "render": function(data, type, row) {
+                    if (row.to == null) {
+                        row.to = row.templateAddress;
+                    }
+                    return '<a href="/addr/' + row.to + '" title="' + row.to + '">' + row.to.substr(0, 10) + '...</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return row.value.substr(0, 10) + ' DPN';
-                    }, "targets": [5]
+                "targets": [4]
+            }, {
+                "render": function(data, type, row) {
+                    return row.value.substr(0, 10) + ' DPN';
                 },
-                {
-                    "render": function (data, type, row) {
-                        return (row.gasPrice * row.gasUsed).toString().substr(0, 10) - 0;
-                    }, "targets": [6]
-                }
-            ]
+                "targets": [5]
+            }, {
+                "render": function(data, type, row) {
+                    return (row.gasPrice * row.gasUsed).toString().substr(0, 10) - 0;
+                },
+                "targets": [6]
+            }]
         });
     };
     fetchUncles();

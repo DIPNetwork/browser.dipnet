@@ -7,6 +7,7 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
       processing: true,
       serverSide: true,
       paging: true,
+      "scrollX": true,
       ajax: function(data, callback, settings) {
         // get totalSupply only once.
         data.totalSupply = $scope.totalSupply || -1;
@@ -41,30 +42,25 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
         infoEmpty: "",
         infoFiltered: "(filtered from _MAX_ total accounts)"
       },
-      columnDefs: [
-        { orderable: false, "targets": [0,1,2,4] },
-        {
-          render:
-            function(data, type, row) {
-              return '<a href="/addr/' + data +'">' + data + '</a>'
-            },
-          targets: [1]
+      columnDefs: [{
+        orderable: false,
+        "targets": [0, 1, 2, 4]
+      }, {
+        render: function(data, type, row) {
+          return '<a href="/addr/' + data + '">' + data + '</a>'
         },
-        {
-          render:
-            function(data, type, row) {
-              return $filter('number')(data, 8);
-            },
-          targets: [3]
+        targets: [1]
+      }, {
+        render: function(data, type, row) {
+          return $filter('number')(data, 8);
         },
-        {
-          render:
-            function(data, type, row) {
-              return $filter('number')(data, 4) + ' %';
-            },
-          targets: [4]
-        }
-      ]
+        targets: [3]
+      }, {
+        render: function(data, type, row) {
+          return $filter('number')(data, 4) + ' %';
+        },
+        targets: [4]
+      }]
     });
   };
 

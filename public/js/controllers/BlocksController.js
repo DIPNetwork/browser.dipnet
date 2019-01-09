@@ -1,6 +1,6 @@
-angular.module('BlocksApp').controller('BlocksController', function ($stateParams, $rootScope, $scope, $http, $location) {
+angular.module('BlocksApp').controller('BlocksController', function($stateParams, $rootScope, $scope, $http, $location) {
     $scope.data = {};
-    var fetchUncles = function () {
+    var fetchUncles = function() {
         var table = $("#table_blocks").DataTable({
             processing: true,
             serverSide: true,
@@ -8,18 +8,19 @@ angular.module('BlocksApp').controller('BlocksController', function ($stateParam
             "ordering": false,
             searching: false,
             stateSave: true,
-            "pagingType": "full_numbers",
-            stateSaveCallback:function(settings,data){
+            "scrollX": true,
+            "pagingType": $("html")[0].offsetWidth > 550 ? "full_numbers" : "full",
+            stateSaveCallback: function(settings, data) {
                 sessionStorage.setItem('blocks_' + settings.sInstance, JSON.stringify(data))
             },
-            stateLoadCallback:function(settings){
-                return JSON.parse( sessionStorage.getItem('blocks_'+settings.sInstance));
+            stateLoadCallback: function(settings) {
+                return JSON.parse(sessionStorage.getItem('blocks_' + settings.sInstance));
             },
-            ajax: function (data, callback, settings) {
+            ajax: function(data, callback, settings) {
                 $http.post('/blocks', {
                     page: Math.ceil(data.start / data.length) + 1,
                     size: data.length
-                }).then(function (list) {
+                }).then(function(list) {
                     // save data
                     data.count = list.data.total;
                     $scope.data.data = [...list.data.data];
@@ -39,49 +40,50 @@ angular.module('BlocksApp').controller('BlocksController', function ($stateParam
                 "infoEmpty": ":(",
                 "infoFiltered": "(filtered from _MAX_ total txs)"
             },
-            "columnDefs": [
-                {"orderable": false, "targets": [0, 1, 2, 3, 4, 5, 6, 7]},
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/block/' + row.number + '">' + row.number + '</a>'
-                    }, "targets": [0]
+            "columnDefs": [{
+                "orderable": false,
+                "targets": [0, 1, 2, 3, 4, 5, 6, 7]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/block/' + row.number + '">' + row.number + '</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return getDuration(row.timestamp).toString();
-                    }, "targets": [1]
+                "targets": [0]
+            }, {
+                "render": function(data, type, row) {
+                    return getDuration(row.timestamp).toString();
                 },
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/transaction?block=' + row.number + '">' + row.transactions + '</a>'
-                    }, "targets": [2]
+                "targets": [1]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/transaction?block=' + row.number + '">' + row.transactions + '</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return row.uncles.length;
-                    }, "targets": [3]
+                "targets": [2]
+            }, {
+                "render": function(data, type, row) {
+                    return row.uncles.length;
                 },
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/addr/' + row.coinbase + '">' + row.coinbase.substr(0, 10) + '...</a>'
-                    }, "targets": [4]
+                "targets": [3]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/addr/' + row.coinbase + '">' + row.coinbase.substr(0, 10) + '...</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return row.gasUsed + ' (' + (row.gasUsed * 100 / row.gasLimit).toString().substr(0, 5) + '%)';
-                    }, "targets": [5]
+                "targets": [4]
+            }, {
+                "render": function(data, type, row) {
+                    return row.gasUsed + ' (' + (row.gasUsed * 100 / row.gasLimit).toString().substr(0, 5) + '%)';
                 },
-                {
-                    "render": function (data, type, row) {
-                        return row.gasLimit;
-                    }, "targets": [6]
+                "targets": [5]
+            }, {
+                "render": function(data, type, row) {
+                    return row.gasLimit;
                 },
-                {
-                    "render": function (data, type, row) {
-                        return row.gasUsed;
-                    }, "targets": [7]
+                "targets": [6]
+            }, {
+                "render": function(data, type, row) {
+                    return row.gasUsed;
                 },
-            ]
+                "targets": [7]
+            }, ]
         });
     };
     fetchUncles();

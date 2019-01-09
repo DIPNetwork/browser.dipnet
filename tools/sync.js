@@ -182,6 +182,10 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
         txData.templateAddress = receipt.templateAddress;
         txData.gasDeveloper = receipt.gasDeveloper;
         txData.gasMiner = receipt.gasMiner;
+        txData.type = receipt.type;
+        txData.txType = receipt.txType;
+        txData.to = txData.to == null ? txData.templateAddress : txData.to;
+        txData.endorseTxList = [];
         if(txData.contractAddress != null && txData.status == '0x1'){
           let contractObj = {creationTransaction:txData.hash,address:txData.contractAddress,templateAddress:txData.to,byteCode:await web3.eth.getCode(txData.contractAddress)};
             Contract.collection.insert([contractObj], function (err, contract) {
@@ -256,7 +260,7 @@ var writeTransactionsToDB = async function (config, blockData, flush) {
                 }
             });
 
-        }
+        };
       }
       self.bulkOps.push(txData);
     }

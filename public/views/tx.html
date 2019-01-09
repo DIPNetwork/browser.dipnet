@@ -73,6 +73,17 @@
                     <td><a href="/addr/{{tx.contractAddress}}"> {{tx.contractAddress }}</a></td>
                 </tr>
                 <tr>
+                    <td width="25%">Endorse Tx List</td>
+                    <td ng-show="tx.endorseTxList.length === 0"><pre>null</pre></td>
+                    <td>
+                        <ul style="margin-bottom: 0;padding: 0">
+                            <li  ng-repeat="value in tx.endorseTxList" style="list-style-type: none">
+                                <a href="/tx/{{value}}"> {{value}}</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
                     <td width="25%">Input Data</td>
                     <td>
                         <pre class="code">{{tx.input}}</pre>

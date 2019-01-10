@@ -402,3 +402,12 @@ template-source .row > .portlet{
     margin-bottom: 8px!important;
   }
 }
+
+
+.portlet-body .tabbable-line > .tab-content {
+  padding:10px 0;
+}
+
+.templateDatas {
+  border-collapse:separate; border-spacing:0px 10px;
+}

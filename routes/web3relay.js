@@ -340,3 +340,5 @@ var getEndorse = function (addr, hash) {
 
 exports.eth = web3.eth;
 exports.getIsTemplate = getIsTemplate;
+exports.config = config;
+exports.web3 = web3;

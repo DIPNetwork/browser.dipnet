@@ -7,6 +7,10 @@ var getIsTemplate = require('./web3relay').getIsTemplate;
 var Contract = require('./contracts');
 var mongoose = require( 'mongoose' );
 var Template     = mongoose.model( 'Template' );
+var config = require('./web3relay').config;
+var request = require('request');
+var web3 = require('./web3relay').web3;
+var crypto = require('crypto');
 /* 
   TODO: support other languages
 */
@@ -19,8 +23,19 @@ module.exports = async function(req, res) {
   } else if (req.body.action=="find") {
       let type = JSON.parse(await getIsTemplate(req.body.addr)).result.type;
       if(type == 'template'){
+        let sourceTx = await getSourceTx(req.body.addr);
+        let result;
+        let input;
+        let md5Hash;
+        let url;
+        if(sourceTx.successful){
+            input = web3.toUtf8(await eth.getTransaction(sourceTx.sourceTxlatestRecorder).input);
+            md5Hash = input.substring(0,32);
+            url = input.substring(32);
+            result = await verifyEqual(url,md5Hash);
+        }
         Template.findOne({'address':req.body.addr}).exec(function (err,doc) {
-            res.write(JSON.stringify(doc._doc));
+            res.write(JSON.stringify({...doc._doc,resource:result.sourceInfo,equal:result.equal}));
             res.end();
         })
       }
@@ -125,4 +140,28 @@ var testValidCode = function(output, data, bytecode, response) {
   data["verifiedContracts"] = verifiedContracts;
   response.write(JSON.stringify(data));
   response.end();
+}
+var getSourceTx = function (addr) {
+    return new Promise((resolve, reject) => {
+        request({url:'http://'+config.nodeAddr+':'+config.gethPort,method:'POST', headers: {
+                "content-type": "application/json",
+            },body:JSON.stringify({"jsonrpc":"2.0","method":"eth_getSourceTx","params":[addr,"latest"],"id":83})},function (error,response,body) {
+            if(!error){
+                resolve(JSON.parse(body).result);
+            }
+        })
+    })
+}
+
+var verifyEqual = function (url,hash) {
+    return new Promise((resolve, reject) => {
+        request(url,function (error,response,body) {
+            if(!error){
+                let md5Hahs = crypto.createHash('md5').update(body).digest('hex');
+                resolve({equal:hash == md5Hahs,sourceInfo:body});
+            }else {
+                reject(false);
+            }
+        })
+    })
 }

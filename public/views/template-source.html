@@ -30,6 +30,45 @@
     </div>
   </div> -->
   <div class="row">
+    <i ng-class=" template.equal === undefined ? 'fa fa-spinner fa-pulse' : (template.equal ? 'fa fa-check-circle-o' : 'fa fa-times')" ng-style="{color:  template.equal === undefined ? 'black' : (template.equal ? 'green' :'red')}"></i>
+    {{template.equal === undefined ? "Loading..." : (template.equal ? "Contract Source Code Verified" : "Contract source code not verified ")}}
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <table class="templateDatas">
+        <tr>
+          <td style="text-align-last: justify;">Contract Name:</td>
+          <td style="text-indent: 20px">{{templateDatas.ContractName}}</td>
+        </tr>
+        <tr>
+          <td style="text-align-last: justify;">Compiler Text:</td>
+          <td style="text-indent: 20px">{{templateDatas.CompilerVersion}}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <table class="templateDatas">
+        <tr>
+          <td style="text-align-last: justify;">Optimization Enabled:</td>
+          <td style="text-indent: 20px">{{templateDatas.OptimizationEnabled}}</td>
+        </tr>
+        <tr>
+          <td style="text-align-last: justify;">Runs (Optimiser): </td>
+          <td style="text-indent: 20px">{{templateDatas["Runs(Optimiser)"]}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+     <span> Contract Source Code <i class="fa fa-code"></i></span>
+     <pre style="max-height: 350px;overflow: auto;" id="code" class="ace_editor" style="min-height:100px"><textarea class="ace_text-input">
+     </textarea></pre>
+  </div>
+  <div class="row">
+     <span> Contract ABI <i class="fa fa-cogs"></i></span>
+     <pre style="max-height: 200px;overflow: auto;" class="code-bytecode" ng-class="{verified: template.valid}">{{templateDatas.abi}}</pre>
+  </div>
+  <div class="row">
     Template Bytecode <i class="fa fa-building-o"></i>
     <pre class="code-bytecode" ng-class="{verified: template.valid}">{{template.byteCode}}</pre>
   </div>
@@ -44,6 +83,7 @@
                 <thead>
                   <tr role="row" class="heading">
                     <th>Template Instance</th>
+
                   </tr>
                 </thead>
                 <tbody></tbody>

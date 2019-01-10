@@ -1,26 +1,27 @@
-angular.module('BlocksApp').controller('UnclesController', function ($stateParams, $rootScope, $scope, $http, $location) {
+angular.module('BlocksApp').controller('UnclesController', function($stateParams, $rootScope, $scope, $http, $location) {
     $scope.data = {};
-    var fetchUncles = function () {
+    var fetchUncles = function() {
         var table = $("#table_uncles").DataTable({
             processing: true,
             serverSide: true,
             paging: true,
             "ordering": false,
             searching: false,
-            stateSave:true,
-            "pagingType": "full_numbers",
-            stateSaveCallback:function(settings,data){
-                sessionStorage.setItem('uncles_'+ settings.sInstance, JSON.stringify(data))
+            "scrollX": true,
+            stateSave: true,
+            "pagingType": $("html")[0].offsetWidth > 550 ? "full_numbers" : "full",
+            stateSaveCallback: function(settings, data) {
+                sessionStorage.setItem('uncles_' + settings.sInstance, JSON.stringify(data))
             },
-            stateLoadCallback:function(settings){
-                return JSON.parse(sessionStorage.getItem('uncles_'+settings.sInstance));
+            stateLoadCallback: function(settings) {
+                return JSON.parse(sessionStorage.getItem('uncles_' + settings.sInstance));
             },
-            ajax: function (data, callback, settings) {
+            ajax: function(data, callback, settings) {
                 data.count = 0;
                 $http.post('/uncles', {
                     page: Math.ceil(data.start / data.length) + 1,
                     size: data.length
-                }).then(function (list) {
+                }).then(function(list) {
                     // save data
                     data.count = list.data.total;
                     $scope.data.data = [...list.data.data];
@@ -40,34 +41,35 @@ angular.module('BlocksApp').controller('UnclesController', function ($stateParam
                 "infoEmpty": ":(",
                 "infoFiltered": "(filtered from _MAX_ total txs)"
             },
-            "columnDefs": [
-                {"orderable": false, "targets": [0, 1, 2, 3, 4]},
-                {
-                    "render": function (data, type, row) {
-                        return row.gasUsed;
-                    }, "targets": [4]
+            "columnDefs": [{
+                "orderable": false,
+                "targets": [0, 1, 2, 3, 4]
+            }, {
+                "render": function(data, type, row) {
+                    return row.gasUsed;
                 },
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/addr/' + row.coinbase + '">' + row.coinbase + '</a>'
-                    }, "targets": [3]
+                "targets": [4]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/addr/' + row.coinbase + '">' + row.coinbase + '</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/uncle/' + row.blockNumber + '/' + row.position + '">' + row.number + '</a>'
-                    }, "targets": [1]
+                "targets": [3]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/uncle/' + row.blockNumber + '/' + row.position + '">' + row.number + '</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return '<a href="/block/' + row.blockHash + '">' + row.blockNumber + '</a>'
-                    }, "targets": [0]
+                "targets": [1]
+            }, {
+                "render": function(data, type, row) {
+                    return '<a href="/block/' + row.blockHash + '">' + row.blockNumber + '</a>'
                 },
-                {
-                    "render": function (data, type, row) {
-                        return getDuration(row.timestamp).toString();
-                    }, "targets": [2]
+                "targets": [0]
+            }, {
+                "render": function(data, type, row) {
+                    return getDuration(row.timestamp).toString();
                 },
-            ]
+                "targets": [2]
+            }, ]
         });
     };
     fetchUncles();

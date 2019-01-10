@@ -76,6 +76,10 @@ exports.data = async function (req, res) {
             if (!err) {
                 if(doc !== null){
                     doc._doc.confirmations = latestNumber-doc._doc.blockNumber;
+                    let endorse = await getEndorse(doc._doc.from,doc._doc.hash)
+                    if(endorse.successful){
+                        doc._doc.endorseTxList = endorse.endorseTxList;
+                    }
                     if(doc._doc.to == null){
                         isCall = false;
                         isCreateCon = false;
@@ -322,6 +326,19 @@ function getIsTemplate(addr){
         })
     })
 }
+var getEndorse = function (addr, hash) {
+    return new Promise((resolve, reject) => {
+        request({url:'http://'+config.nodeAddr+':'+config.gethPort,method:'POST', headers: {
+                "content-type": "application/json",
+            },body:JSON.stringify({"jsonrpc":"2.0","method":"eth_getEndorse","params":[addr,hash,"latest"],"id":83})},function (error,response,body) {
+            if(!error){
+                resolve(JSON.parse(body).result);
+            }
+        })
+    })
+}
 
 exports.eth = web3.eth;
 exports.getIsTemplate = getIsTemplate;
+exports.config = config;
+exports.web3 = web3;

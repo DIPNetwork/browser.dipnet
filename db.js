@@ -76,7 +76,13 @@ var Transaction = new Schema(
     "gasUsed":Number,
     "contractAddress":String,
     "logs":Array,
-    "status":String
+    "status":String,
+    "type":Number,
+    "endorseTxList":Array,
+    "gasDeveloper":Number,
+    "gasMiner":Number,
+    "templateAddress":String,
+    "txType":String
 }, {collection: "Transaction"});
 
 var BlockStat = new Schema(

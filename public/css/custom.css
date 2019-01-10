@@ -395,3 +395,19 @@ template-source .tabbable-line>.tab-content {
 template-source .row > .portlet{
     padding: 0;
 }
+
+
+@media screen and (max-width: 767px) {
+  .dataTables_info{
+    margin-bottom: 8px!important;
+  }
+}
+
+
+.portlet-body .tabbable-line > .tab-content {
+  padding:10px 0;
+}
+
+.templateDatas {
+  border-collapse:separate; border-spacing:0px 10px;
+}

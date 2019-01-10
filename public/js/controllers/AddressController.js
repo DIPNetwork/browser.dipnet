@@ -57,7 +57,6 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
                 processing: true,
                 serverSide: true,
                 paging: true,
-                "scrollX": true,
                 ajax: function(data, callback, settings) {
                     data.addr = $scope.addrHash;
                     data.count = $scope.addr.count;
@@ -339,10 +338,20 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
                                     "action": "find"
                                 }
                             }).then(function(list) {
+                                $scope.templateDatas = JSON.parse(list.data.resource)
+                            $scope.templateDatas.abi = JSON.stringify($scope.templateDatas.abi)
                                 $scope.template = list.data;
                                 $scope.template.data = [...list.data.instance];
                                 $scope.template.recordsTotal = list.data.instance.length;
                                 $scope.template.recordsFiltered = list.data.instance.length;
+                                let editor = ace.edit("code");
+                                editor.setTheme("ace/theme/dawn")
+                                editor.getSession().setMode("ace/mode/less");
+                                editor.setOption("indentedSoftWrap", false);
+                                editor.setReadOnly(true);
+
+                                editor.getSession().setUseWrapMode(true);
+                                editor.setValue($scope.templateDatas.sourceCode)
                                 callback($scope.template);
                             });
                         },
